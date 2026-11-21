@@ -1,11 +1,11 @@
 ---
 title: "Remote Process Injection en Windows"
-description: "TODO"
+description: "Qué es la Remote Process Injection en Windows, su metodología paso a paso, las API functions implicadas y cómo observar su rastro en memoria."
 date: 2023-11-22
 category: malware-development
 tags: [malware-development]
 cover: ./img/portada.png
-coverAlt: "TODO"
+coverAlt: "Portada del artículo sobre Remote Process Injection en Windows"
 series:
   name: "Malware Development"
   order: 2
@@ -30,19 +30,19 @@ Remote Process Injection es una técnica utilizada en el desarrllo de malware qu
 
 Lo primero que debemos de tener en mente es tener clara la estructura de este tipo de ataque. En este caso tendremos nuestro binario ejecutable y un proceso en ejecución que será la calculadora.
 
-![ALT_TODO:context.png](./img/context.png)
+![Esquema del contexto inicial del proceso](./img/context.png)
 
 Cuando tenemos la calculadora (en este caso) en ejecución, el siguiente paso será crear un buffer de memoria en el proceso de la calculadora en donde el tamaño del buffer debe de ser como mínimo del tamaño de nuestro payload.
 
-![ALT_TODO:allocate.png](./img/allocate.png)
+![Esquema de reserva de memoria en el proceso](./img/allocate.png)
 
 Una vez creado el empty buffer de memoria en el proceso de la calculadora deberemos de inyectar nuestro payload (shellcode).
 
-![ALT_TODO:calcpayload.png](./img/calcpayload.png)
+![Esquema del payload escrito en el proceso](./img/calcpayload.png)
 
 Por último será poder ejecutar el código malicioso que alojamos en el buffer de la calculadora.
 
-![ALT_TODO:execute.png](./img/execute.png)
+![Esquema de ejecución del payload en el proceso](./img/execute.png)
 
 ## Funcionamiento de las API functions
 
@@ -134,25 +134,25 @@ Una vez claro más o menos una idea de como funcionan las funciones que vamos a 
 
 Lo primero necesitamos obtener el pid del proceso, lo podemos hacer con una función personalizada o indicándolo de manera harcodeada en el código o incluso indicándolo por teclado. En este caso he decidido implementar que el usuario lo introduzca por teclado.
 
-![ALT_TODO:openprocess.png](./img/openprocess.png)
+![Llamada a la función OpenProcess](./img/openprocess.png)
 
 Ahora vamos a asignar memoria en el proceso que hemos especificado.
 
-![ALT_TODO:virtuallallocex.png](./img/virtuallallocex.png)
+![Llamada a la función VirtualAllocEx](./img/virtuallallocex.png)
 
 Lo siguiente será que deberemos será copiar el payload almacenado de nuestro binario al buffer de memoria del proceso remoto (calc.exe).
 
-![ALT_TODO:writeprocessmemory.png](./img/writeprocessmemory.png)
+![Llamada a la función WriteProcessMemory](./img/writeprocessmemory.png)
 
 Por último deberemos de indicar que proceso inicializará el hilo para poder ejecutar el payload.
 
-![ALT_TODO:createremotethread.png](./img/createremotethread.png)
+![Llamada a la función CreateRemoteThread](./img/createremotethread.png)
 
 ## Generar el shellcode
 
 Ahora necesitamos generar nuestro shellcode, que será el código que posteriormente será ejecutado. Para ello utilizaremos la herramienta `msfvenom` la cual viene de la suite de metasploit en donde será fundamental para generar nuestro shellcode.
 
-![ALT_TODO:shellcodegen.png](./img/shellcodegen.png)
+![Generación del shellcode desde la terminal](./img/shellcodegen.png)
 
 ## Codigo final
 
@@ -228,11 +228,11 @@ En este caso si deseamos compilar el malware desde Visual Studio deberemos de co
 
 #### Code Generation Visual Studio
 
-![ALT_TODO:errorruntime.png](./img/errorruntime.png)
+![Error de runtime al ejecutar el binario](./img/errorruntime.png)
 
 En este apartado lo que vamos a modificar es que a la hora de generar el código nos permita le deberemos de especificar `Multi-threaded Debug (/Mtd)` en caso de que deseemos el binario con una biblioteca de tiempo de ejecución que a su vez incluye información de depuración. Para la versión final del malware es recomendable utilizar `Multi-threaded (/MT)`.
 
-![ALT_TODO:generationfix.png](./img/generationfix.png)
+![Ajuste de la configuración de generación del proyecto](./img/generationfix.png)
 
 Al utilizarlo podremos compilar para cualquier equipo para Windows x64.
 
@@ -256,36 +256,36 @@ x86_64-w64-mingw32-gcc maldev.cpp -o maldev.exe -s -ffunction-sections -fdata-se
 
 ## Ejecución
 
-![ALT_TODO:pidcalc.png](./img/pidcalc.png)
+![PID del proceso de la calculadora](./img/pidcalc.png)
 
 Como podemos ver el ID de proceso de la calc.exe es 10520. A continuación, ejecutamos nuestro inyector en la máquina víctima de la siguiente manera:
 
-![ALT_TODO:execmaldev.png](./img/execmaldev.png)
+![Ejecución del programa con el PID objetivo](./img/execmaldev.png)
 
 Al ejecutar como vemos se nos ejecuta el shellcode y nos llega.
 
-![ALT_TODO:reverseshell.png](./img/reverseshell.png)
+![Reverse shell recibida en la terminal](./img/reverseshell.png)
 
 ## Analizamos el Funcionamiento
 
 Para investigar nuestro exe, usaremos Process Hacker. Process Hacker es una herramienta de código abierto que le permitirá ver qué procesos se están ejecutando en un dispositivo, identificar programas que están consumiendo recursos de la CPU e identificar conexiones de red asociadas con un proceso en otro tipos de opciones que iremos descubriendo poco a poco en los posts.
 
-![ALT_TODO:network.png](./img/network.png)
+![Conexiones de red del proceso](./img/network.png)
 
 Una vez ejecutado el binario. Luego en la pestaña de Network vemos que nuestro proceso establece conexión con 192.168.1.159:443 (host del atacante).
 
 A su vez en el apartado de **Memory** podemos ver las diferentes regiones de la memoria de dicho binario a través del cuál podemos ver su protección. Con la función de VirtualAlloc podemos ver que asignamos una región de memoria en donde le asignábamos el permiso de protección `PAGE_EXECUTE_READWRITE (RWX)`. Lo podemos identificar fácil de la siguiente manera.
 
-![ALT_TODO:memory.png](./img/memory.png)
+![Región de memoria reservada en el proceso remoto](./img/memory.png)
 
 Si nos fijamos bien es el único apartado de la región del buffer en donde encontramos este tipo de permisos. A modo de consejo no es recomendable utilizar este tipo de permiso para poder ejecutar código debido a que es muy facil para AV/EDR de detectar a nivel de memoria.
 
-![ALT_TODO:shellcodememory.png](./img/shellcodememory.png)
+![Shellcode alojado en la memoria del proceso](./img/shellcodememory.png)
 
 Como podemos ver el contenido de ese apartado podemos encontrar en hexadecimal nuestro shellcode que generamos literalmente. El shellcode esta sin encriptar lo que hace que el AV/EDR nos detecte a nivel de IOC nuestro shellcode por lo tanto detectando el malware.
 
 ## Conclusión
 
-![ALT_TODO:avdesactivado.png](./img/avdesactivado.png)
+![Antivirus desactivado en el equipo de pruebas](./img/avdesactivado.png)
 
 Este post no trata de evadir el AV/EDR, trata sobre malware development en los siguientes post estaré hablando de diferentes formas de ejecutar código a través de la técnica de Dll Injection.

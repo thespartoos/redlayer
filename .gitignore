@@ -23,5 +23,3 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# Posts del blog antiguo pendientes de completar (no se publican)
-# migracion-pendiente/

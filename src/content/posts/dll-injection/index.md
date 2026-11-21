@@ -1,11 +1,11 @@
 ---
 title: "DLL Injection en Windows"
-description: "TODO"
+description: "Qué es la DLL Injection en Windows, en qué se diferencia una DLL de un EXE, cómo funciona la técnica paso a paso y cómo analizarla en memoria."
 date: 2023-11-24
 category: malware-development
 tags: [malware-development]
 cover: ./img/portada.png
-coverAlt: "TODO"
+coverAlt: "Portada del artículo sobre DLL Injection en Windows"
 series:
   name: "Malware Development"
   order: 3
@@ -19,7 +19,7 @@ draft: false
 
 Una DLL (Dynamic-Link Library) es una biblioteca que contiene código y datos que pueden usar más de un programa al mismo tiempo. Esto es crucial debido a que las aplicaciones de windows reutilizan código, con lo cuál lo hace más eficiente.
 
-![ALT_TODO:dllmodules.png](./img/dllmodules.png)
+![Módulos DLL cargados por un proceso](./img/dllmodules.png)
 
 Al inyectar una DLL en un proceso que ya se está ejecutando, el malware puede obtener el mismo nivel de acceso y privilegios que el proceso mismo.
 
@@ -112,7 +112,7 @@ Sólo consta de `DllMain` cuál es la función principal de la biblioteca DLL. N
 
 En el caso de que quieras realizar en Visual Studio la DLL deberemos de configurar una opción dentro del IDE. Lo primero es crear el proyecto en C++ y luego configurar la opción.
 
-![ALT_TODO:changedll.png](./img/changedll.png)
+![Cambio del tipo de proyecto a DLL](./img/changedll.png)
 
 Lo que estamos haciendo es decirle al IDE que queremos compilar para una DLL y así cuando generemos nuestro código lo hará para DLL.
 
@@ -132,13 +132,13 @@ Una vez creada la DLL vamos a crear un nuevo buffer vacío de memoria de un tama
 
 El primer paso será agregar la ruta de nuestra DLL desde el disco.
 
-![ALT_TODO:dllpath.png](./img/dllpath.png)
+![Ruta de la DLL en el código](./img/dllpath.png)
 
 Lo siguiente que necesitaremos será obtener la dirección de memoria de LoadLibraryA ya que será llamada esa API a la hora de crear el hilo para que nos cargue la DLL.
 
 Para ello primero cargaremos el modulo en donde de `kernel32.dll` que es en donde se encuentra la función de **LoadLibraryA**.
 
-![ALT_TODO:loadlibrarya.png](./img/loadlibrarya.png)
+![Llamada a la función LoadLibraryA](./img/loadlibrarya.png)
 
 ## Código Final
 
@@ -187,11 +187,11 @@ En este caso si deseamos compilar el malware desde Visual Studio deberemos de co
 
 #### Code Generation Visual Studio
 
-![ALT_TODO:errorruntime.png](./img/errorruntime.png)
+![Error de runtime al ejecutar el binario](./img/errorruntime.png)
 
 En este apartado lo que vamos a modificar es que a la hora de generar el código nos permita le deberemos de especificar `Multi-threaded Debug (/Mtd)` en caso de que deseemos el binario con una biblioteca de tiempo de ejecución que a su vez incluye información de depuración. Para la versión final del malware es recomendable utilizar `Multi-threaded (/MT)`.
 
-![ALT_TODO:generationfix.png](./img/generationfix.png)
+![Ajuste de la configuración de generación del proyecto](./img/generationfix.png)
 
 Al utilizarlo podremos compilar para cualquier equipo para Windows x64.
 
@@ -221,11 +221,11 @@ x86_64-w64-mingw32-gcc -O2 evil_inj.cpp -o inj.exe -mconsole -I/usr/share/mingw-
 
 Antes que nada deberemos de dejar nuestra dll colocada en alguna ruta de nuestro disco, para este caso será `C:\`.
 
-![ALT_TODO:dllcolocar.png](./img/dllcolocar.png)
+![Ubicación de la DLL en el sistema](./img/dllcolocar.png)
 
 Una vez la dll este colocada en la ruta en donde especificamos en nuestro malware podremos efectuar la DLL Injection.
 
-![ALT_TODO:ejecucion.png](./img/ejecucion.png)
+![Ejecución del programa en la consola](./img/ejecucion.png)
 
 Ha sido todo un éxito.
 
@@ -233,18 +233,18 @@ Ha sido todo un éxito.
 
 En esta parte vamos ha estar analizando que es lo que está ocurriendo por detrás en memoria a través de esta técnica. Lo primero será abrir nuestro Process Hacker y observar que DLL esta utilizando.
 
-![ALT_TODO:dllinjected.png](./img/dllinjected.png)
+![DLL inyectada en el proceso objetivo](./img/dllinjected.png)
 
 Podemos observar que la DLL fue correctamente cargada por nuestro programa. Ahora pasemos a ver la memoria de nuestro programa y ver el comportamiento respecto a nuestra DLL.
 
-![ALT_TODO:memorydll.png](./img/memorydll.png)
+![Región de memoria donde reside la DLL](./img/memorydll.png)
 
 Tenemos diferentes direcciones que involucran a nuestra DLL y con diferentes permisos. En una de ellas se encuentra el texto claro que se encuentra en nuestra DLL y se puede ver en texto plano, porque está sin cifrar.
 
-![ALT_TODO:textdll.png](./img/textdll.png)
+![Texto mostrado por la DLL inyectada](./img/textdll.png)
 
 ## Conclusión
 
-![ALT_TODO:avdesactivado.png](./img/avdesactivado.png)
+![Antivirus desactivado en el equipo de pruebas](./img/avdesactivado.png)
 
 Este post no trata de evadir el AV/EDR, trata sobre malware development. En los próximos post estaré tratando temas relacionados con encriptar el shellcode con XOR y AES para evadir la detección estática.

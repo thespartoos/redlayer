@@ -64,6 +64,5 @@ nmap -sCV 10.10.10.5          ← bash/powershell se muestran con marco de termi
 
 ## Pendiente
 
-- `migracion-pendiente/`: los 7 posts del blog antiguo, con sus imágenes. Les falta `description` y `coverAlt` (marcados `TODO`) y el `alt` de las capturas (`ALT_TODO`). Cuando estén completos, mueve cada carpeta a `src/content/posts/`.
 - Rellenar los `TODO(autor)` de `/sobre-mi/`, aviso legal y privacidad.
 - Activar newsletter (Brevo), comentarios (Giscus), contacto (Web3Forms) y analítica (Cloudflare) en `src/consts.ts`.

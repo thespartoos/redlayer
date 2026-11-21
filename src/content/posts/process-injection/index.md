@@ -1,11 +1,11 @@
 ---
 title: "Classic Process Injection en Windows"
-description: "TODO"
+description: "Qué es la Classic Process Injection en Windows, cómo funciona la técnica paso a paso y cómo analizar su comportamiento en el sistema y la red."
 date: 2023-11-07
 category: malware-development
 tags: [malware-development]
 cover: ./img/portada.png
-coverAlt: "TODO"
+coverAlt: "Portada del artículo sobre Classic Process Injection en Windows"
 series:
   name: "Malware Development"
   order: 1
@@ -164,7 +164,7 @@ int main() {
 
 Ahora necesitamos generar nuestro shellcode, que será el código que posteriormente será ejecutado. Para ello utilizaremos la herramienta `msfvenom` la cual viene de la suite de metasploit en donde será fundamental para generar nuestro shellcode.
 
-![ALT_TODO:shellcodegen.png](./img/shellcodegen.png)
+![Generación del shellcode desde la terminal](./img/shellcodegen.png)
 
 ## Malware programado
 
@@ -244,11 +244,11 @@ En este caso si deseamos compilar el malware desde Visual Studio deberemos de co
 
 #### Code Generation Visual Studio
 
-![ALT_TODO:errorruntime.png](./img/errorruntime.png)
+![Error de runtime al ejecutar el binario](./img/errorruntime.png)
 
 En este apartado lo que vamos a modificar es que a la hora de generar el código nos permita le deberemos de especificar `Multi-threaded Debug (/Mtd)` en caso de que deseemos el binario con una biblioteca de tiempo de ejecución que a su vez incluye información de depuración. Para la versión final del malware es recomendable utilizar `Multi-threaded (/MT)`.
 
-![ALT_TODO:generationfix.png](./img/generationfix.png)
+![Ajuste de la configuración de generación del proyecto](./img/generationfix.png)
 
 Al utilizarlo podremos compilar para cualquier equipo para Windows x64.
 
@@ -272,18 +272,18 @@ x86_64-w64-mingw32-gcc maldev.cpp -o maldev.exe -s -ffunction-sections -fdata-se
 
 Una vez creado el shellcode runner, al ejecutar como vemos se nos ejecuta el shellcode y nos llega.
 
-![ALT_TODO:reverseshell.png](./img/reverseshell.png)
+![Reverse shell recibida en la terminal](./img/reverseshell.png)
 
 ## Analizamos el Funcionamiento
 
 Para investigar nuestro exe, usaremos Process Hacker. Process Hacker es una herramienta de código abierto que le permitirá ver qué procesos se están ejecutando en un dispositivo, identificar programas que están consumiendo recursos de la CPU e identificar conexiones de red asociadas con un proceso en otro tipos de opciones que iremos descubriendo poco a poco en los posts.
 
-![ALT_TODO:network.png](./img/network.png)
+![Conexiones de red del proceso](./img/network.png)
 
 Una vez ejecutado el binario. Luego en la pestaña de Network veremos que nuestro proceso establece conexión con 192.168.1.159:443(host del atacante).
 
 ## Conclusión
 
-![ALT_TODO:avdesactivado.png](./img/avdesactivado.png)
+![Antivirus desactivado en el equipo de pruebas](./img/avdesactivado.png)
 
 Este post no trata de evadir el AV/EDR, trata sobre malware development en los siguientes post estaré hablando de diferentes formas de ejecutar código en procesos remotos.

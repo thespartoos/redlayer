@@ -1,0 +1,44 @@
+---
+import { Image } from 'astro:assets';
+import Pildora from './Pildora.astro';
+import PostMeta from './PostMeta.astro';
+import Icon from './Icon.astro';
+import { postUrl, readingTime, type Post } from '../lib/posts';
+import { AUTHOR } from '../consts';
+interface Props {
+	post: Post;
+}
+const { post } = Astro.props;
+const { title, description, cover, coverAlt, category, date } = post.data;
+---
+
+<article class="panel relative isolate overflow-hidden">
+	<Image
+		src={cover}
+		alt={coverAlt}
+		widths={[800, 1200, 1600]}
+		sizes="(min-width: 1280px) 860px, 100vw"
+		loading="eager"
+		fetchpriority="high"
+		class="absolute inset-0 -z-20 h-full w-full object-cover object-right"
+	/>
+	<!-- Velo para que el texto cumpla contraste AA sobre cualquier portada -->
+	<div
+		class="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#0a1020_0%,#0a1020_48%,rgba(10,16,32,.75)_68%,rgba(10,16,32,.15)_100%)] max-md:bg-[#0a1020]/90"
+	>
+	</div>
+	<div class="dark flex min-h-[22rem] max-w-[38rem] flex-col justify-center p-6 text-[#e6ebf5] sm:p-10">
+		<div><Pildora categoria={category} enlace sobreImagen /></div>
+		<h1 class="mt-5 text-[1.875rem] leading-[1.12] font-[780] tracking-[-0.02em] sm:text-4xl">
+			<a href={postUrl(post)} class="hover:underline hover:decoration-2 hover:underline-offset-4">{title}</a>
+		</h1>
+		<p class="mt-4 text-[1.0625rem] leading-relaxed text-[#b8c3d8]">{description}</p>
+		<PostMeta date={date} minutos={readingTime(post.body)} autor={`Por ${AUTHOR.name}`} class="mt-5 !text-[#b8c3d8]" />
+		<div class="mt-7">
+			<a href={postUrl(post)} class="boton !bg-[#4f8cff] !text-[#06101f] hover:!bg-[#7aa7ff]">
+				Leer artículo
+				<Icon name="arrowRight" size={17} />
+			</a>
+		</div>
+	</div>
+</article>

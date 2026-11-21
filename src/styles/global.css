@@ -1,0 +1,306 @@
+@import 'tailwindcss';
+
+/* El modo oscuro lo controla la clase .dark en <html> (toggle + preferencia del SO) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ───────── Tokens (ver plan §4) ─────────
+   abismo  fondo · casco superficie · junta bordes · tinta texto
+   niebla  secundario · señal acento · shell verde de terminal */
+:root {
+	--abismo: #f7f9fc;
+	--casco: #ffffff;
+	--casco-2: #eef2f8;
+	--junta: #d9e0ec;
+	--tinta: #0f172a;
+	--niebla: #4a5874;
+	--senal: #1d4ed8;
+	--senal-hover: #1e40af;
+	--senal-tinta: #ffffff;
+	--shell: #15803d;
+	--terminal-bg: #0a1020;
+	--terminal-tinta: #e6ebf5;
+	color-scheme: light;
+}
+.dark {
+	--abismo: #0a1020;
+	--casco: #111a2e;
+	--casco-2: #16213a;
+	--junta: #1f2b46;
+	--tinta: #e6ebf5;
+	--niebla: #9aa8c2;
+	--senal: #4f8cff;
+	--senal-hover: #7aa7ff;
+	--senal-tinta: #06101f;
+	--shell: #4ade80;
+	--terminal-bg: #070c18;
+	--terminal-tinta: #e6ebf5;
+	color-scheme: dark;
+}
+
+@theme {
+	--color-abismo: var(--abismo);
+	--color-casco: var(--casco);
+	--color-casco-2: var(--casco-2);
+	--color-junta: var(--junta);
+	--color-tinta: var(--tinta);
+	--color-niebla: var(--niebla);
+	--color-senal: var(--senal);
+	--color-senal-hover: var(--senal-hover);
+	--color-senal-tinta: var(--senal-tinta);
+	--color-shell: var(--shell);
+
+	--font-sans: var(--font-schibsted), system-ui, sans-serif;
+	--font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+	/* Escala tipográfica ratio 1.25 */
+	--text-xs: 0.875rem;
+	--text-sm: 0.9375rem;
+	--text-base: 1rem;
+	--text-lg: 1.125rem;
+	--text-xl: 1.375rem;
+	--text-2xl: 1.75rem;
+	--text-3xl: 2.1875rem;
+	--text-4xl: 2.75rem;
+
+	/* Jerarquía de radios: contenedor > tarjeta > control > píldora */
+	--radius-contenedor: 14px;
+	--radius-tarjeta: 10px;
+	--radius-control: 6px;
+
+	--container-lectura: 68ch;
+}
+
+@layer base {
+	html {
+		background: var(--abismo);
+		color: var(--tinta);
+		font-family: var(--font-sans);
+		-webkit-font-smoothing: antialiased;
+		text-rendering: optimizeLegibility;
+		scroll-padding-top: 5rem;
+	}
+	body {
+		background: var(--abismo);
+		min-height: 100dvh;
+	}
+	::selection {
+		background: color-mix(in srgb, var(--senal) 35%, transparent);
+	}
+	:focus-visible {
+		outline: 2px solid var(--senal);
+		outline-offset: 3px;
+		border-radius: 4px;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important;
+			transition-duration: 0.01ms !important;
+			scroll-behavior: auto !important;
+		}
+	}
+}
+
+/* Transiciones nativas entre páginas (0 JS) */
+@view-transition {
+	navigation: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+	@view-transition {
+		navigation: none;
+	}
+}
+
+@layer components {
+	/* Píldora de categoría: el color llega por --cat */
+	.pildora {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.1875rem 0.625rem;
+		border-radius: 999px;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		line-height: 1.4;
+		color: var(--cat);
+		background: color-mix(in srgb, var(--cat) 13%, transparent);
+		border: 1px solid color-mix(in srgb, var(--cat) 30%, transparent);
+	}
+	:root:not(.dark) .pildora:not(.sobre-imagen) {
+		color: color-mix(in srgb, var(--cat) 62%, #000);
+	}
+
+	.boton {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.625rem 1.125rem;
+		border-radius: var(--radius-control);
+		font-weight: 600;
+		font-size: 0.9375rem;
+		line-height: 1.2;
+		background: var(--senal);
+		color: var(--senal-tinta);
+		transition: background-color 150ms;
+	}
+	.boton:hover {
+		background: var(--senal-hover);
+	}
+	.boton-borde {
+		background: transparent;
+		color: var(--senal);
+		border: 1px solid color-mix(in srgb, var(--senal) 55%, transparent);
+	}
+	.boton-borde:hover {
+		background: color-mix(in srgb, var(--senal) 10%, transparent);
+	}
+
+	.panel {
+		background: var(--casco);
+		border: 1px solid var(--junta);
+		border-radius: var(--radius-contenedor);
+	}
+
+	/* ───────── Prosa de artículo ───────── */
+	.prosa {
+		font-size: 1.125rem;
+		line-height: 1.7;
+		color: var(--tinta);
+		max-width: var(--container-lectura);
+	}
+	.prosa > * + * {
+		margin-top: 1.25em;
+	}
+	.prosa h2 {
+		font-size: 1.75rem;
+		line-height: 1.2;
+		font-weight: 750;
+		letter-spacing: -0.01em;
+		margin-top: 2.2em;
+		scroll-margin-top: 5.5rem;
+	}
+	.prosa h3 {
+		font-size: 1.375rem;
+		line-height: 1.25;
+		font-weight: 700;
+		margin-top: 1.8em;
+		scroll-margin-top: 5.5rem;
+	}
+	.prosa h4 {
+		font-size: 1.125rem;
+		font-weight: 700;
+		margin-top: 1.6em;
+	}
+	.prosa a {
+		color: var(--senal);
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+	}
+	.prosa a:hover {
+		text-decoration-thickness: 2px;
+	}
+	.prosa strong {
+		font-weight: 700;
+	}
+	.prosa ul,
+	.prosa ol {
+		padding-left: 1.4em;
+	}
+	.prosa ul {
+		list-style: disc;
+	}
+	.prosa ol {
+		list-style: decimal;
+	}
+	.prosa li + li {
+		margin-top: 0.4em;
+	}
+	.prosa li::marker {
+		color: var(--niebla);
+	}
+	.prosa :not(pre) > code {
+		font-family: var(--font-mono);
+		font-size: 0.875em;
+		padding: 0.125em 0.375em;
+		border-radius: 5px;
+		background: var(--casco-2);
+		border: 1px solid var(--junta);
+		overflow-wrap: anywhere;
+	}
+	.prosa img {
+		border-radius: var(--radius-tarjeta);
+		border: 1px solid var(--junta);
+		height: auto;
+		max-width: 100%;
+	}
+	.prosa blockquote {
+		border-left: 3px solid var(--junta);
+		padding-left: 1em;
+		color: var(--niebla);
+	}
+	.prosa hr {
+		border: 0;
+		border-top: 1px solid var(--junta);
+		margin: 2.5em 0;
+	}
+	.prosa table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.9375rem;
+		display: block;
+		overflow-x: auto;
+	}
+	.prosa th,
+	.prosa td {
+		border: 1px solid var(--junta);
+		padding: 0.5em 0.75em;
+		text-align: left;
+	}
+	.prosa td code {
+		white-space: nowrap;
+	}
+	.prosa th {
+		background: var(--casco-2);
+		font-weight: 600;
+	}
+	.prosa .expressive-code {
+		margin-top: 1.5em;
+		margin-bottom: 1.5em;
+	}
+
+	/* Avisos: > [!NOTE] … (plugin src/lib/callouts.mjs) */
+	.callout {
+		--c: var(--senal);
+		border: 1px solid color-mix(in srgb, var(--c) 35%, var(--junta));
+		border-left: 4px solid var(--c);
+		background: color-mix(in srgb, var(--c) 7%, var(--casco));
+		border-radius: var(--radius-control);
+		padding: 0.875rem 1.125rem;
+		font-size: 1rem;
+	}
+	.callout-tip {
+		--c: #22c55e;
+	}
+	.callout-important {
+		--c: #a78bfa;
+	}
+	.callout-warning {
+		--c: #f5b544;
+	}
+	.callout-caution {
+		--c: #f87171;
+	}
+	.callout-title {
+		font-weight: 700;
+		color: var(--c);
+		margin-bottom: 0.25rem;
+	}
+	:root:not(.dark) .callout-title {
+		color: color-mix(in srgb, var(--c) 60%, #000);
+	}
+	.callout-body > * + * {
+		margin-top: 0.6em;
+	}
+}

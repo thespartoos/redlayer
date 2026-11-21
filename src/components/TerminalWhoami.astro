@@ -1,0 +1,96 @@
+---
+// Elemento memorable de la home: escribe una vez, carácter a carácter, y termina
+// con un enlace real al último artículo. Sin JS o con reduced-motion se ve completo.
+import { AUTHOR } from '../consts';
+import { postUrl, type Post } from '../lib/posts';
+interface Props {
+	ultimo?: Post;
+}
+const { ultimo } = Astro.props;
+---
+
+<div
+	class="rounded-tarjeta border border-[#1f2b46] bg-[var(--terminal-bg)] font-mono text-[0.875rem] leading-[1.75] text-[var(--terminal-tinta)]"
+	data-terminal
+>
+	<div class="flex items-center gap-1.5 border-b border-[#1f2b46] px-4 py-2.5" aria-hidden="true">
+		<span class="size-2.5 rounded-full bg-[#f87171]/80"></span>
+		<span class="size-2.5 rounded-full bg-[#f5b544]/80"></span>
+		<span class="size-2.5 rounded-full bg-[#34d399]/80"></span>
+		<span class="ml-2 text-xs text-[#9aa8c2]">redlayer — bash</span>
+	</div>
+	<div class="px-4 py-3.5">
+		<p><span class="text-[#4ade80]">$</span> <span data-escribir>whoami</span></p>
+		<p class="text-[#9aa8c2]" data-salida>{AUTHOR.alias} — {AUTHOR.jobTitle.toLowerCase()}</p>
+		{
+			ultimo && (
+				<>
+					<p>
+						<span class="text-[#4ade80]">$</span> <span data-escribir>cat ultimo.md</span>
+					</p>
+					<p data-salida>
+						<a
+							href={postUrl(ultimo)}
+							class="text-[#7aa7ff] underline decoration-[#7aa7ff]/40 underline-offset-4 hover:decoration-[#7aa7ff]"
+						>
+							{ultimo.data.title}
+						</a>
+					</p>
+				</>
+			)
+		}
+		<p>
+			<span class="text-[#4ade80]">$</span>
+			<span class="cursor ml-2 inline-block h-[1.05em] w-[0.55em] translate-y-[0.18em] bg-[#e6ebf5]" aria-hidden="true"
+			></span>
+		</p>
+	</div>
+</div>
+
+<script>
+	const t = document.querySelector('[data-terminal]');
+	const reducir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+	if (t && !reducir && !sessionStorage.getItem('terminal-vista')) {
+		const pasos = [...t.querySelectorAll<HTMLElement>('[data-escribir], [data-salida]')];
+		const textos = pasos.map((el) => el.textContent ?? '');
+		pasos.forEach((el) => {
+			if (el.hasAttribute('data-escribir')) el.textContent = '';
+			else el.style.visibility = 'hidden';
+		});
+		const espera = (ms: number) => new Promise((r) => setTimeout(r, ms));
+		(async () => {
+			await espera(450);
+			for (const [i, el] of pasos.entries()) {
+				if (el.hasAttribute('data-escribir')) {
+					for (const ch of textos[i]) {
+						el.textContent += ch;
+						await espera(55 + Math.random() * 45);
+					}
+					await espera(260);
+				} else {
+					el.style.visibility = '';
+					await espera(380);
+				}
+			}
+			try {
+				sessionStorage.setItem('terminal-vista', '1');
+			} catch {}
+		})();
+	}
+</script>
+
+<style>
+	.cursor {
+		animation: parpadeo 1.1s steps(1) infinite;
+	}
+	@keyframes parpadeo {
+		50% {
+			opacity: 0;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.cursor {
+			animation: none;
+		}
+	}
+</style>

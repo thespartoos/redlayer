@@ -1,0 +1,86 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CabeceraPagina from '../components/CabeceraPagina.astro';
+import Icon from '../components/Icon.astro';
+import { migas } from '../lib/migas';
+import { AUTHOR, CONTACTO, SITE } from '../consts';
+
+const activo = CONTACTO.web3formsKey.trim().length > 0;
+
+const title = 'Contacto';
+const description =
+	'Escríbeme para proponer un tema, avisar de un error en un artículo o plantear una colaboración relacionada con RedLayer y el hacking ético en español.';
+
+const campo =
+	'mt-1.5 block w-full rounded-control border border-junta bg-abismo px-3 py-2.5 text-base text-tinta placeholder:text-niebla/70 focus:border-senal focus:outline-none focus-visible:outline-2 focus-visible:outline-senal';
+const etiqueta = 'block text-[0.9375rem] font-semibold text-tinta';
+---
+
+<BaseLayout title={title} description={description} jsonLd={[migas(['Contacto', '/contacto/'])]}>
+	<div class="mx-auto max-w-[1280px] px-4 pt-10 sm:px-6 lg:pt-14">
+		<CabeceraPagina
+			titulo="Contacto"
+			entradilla="¿Has visto un error, quieres proponer un tema o plantear una colaboración? Te leo."
+		/>
+
+		<div class="mt-8 max-w-2xl">
+			{
+				!activo && (
+					<p id="aviso-formulario" role="status" class="callout callout-warning mb-6">
+						El formulario aún no está activo. Mientras tanto puedes contactar a través de
+						<a href={AUTHOR.sameAs[0]} class="font-semibold underline">GitHub</a>.
+					</p>
+				)
+			}
+
+			<form action="https://api.web3forms.com/submit" method="POST" class="panel space-y-5 p-6 sm:p-8">
+				<input type="hidden" name="access_key" value={CONTACTO.web3formsKey} />
+				<input type="hidden" name="subject" value={`Nuevo mensaje desde ${SITE.name}`} />
+				<input type="hidden" name="from_name" value={SITE.name} />
+				<!-- Honeypot anti-spam: los humanos no lo ven; si llega marcado, Web3Forms descarta el envío -->
+				<input type="checkbox" name="botcheck" class="hidden" style="display:none" tabindex="-1" autocomplete="off" />
+
+				<div>
+					<label for="nombre" class={etiqueta}>Nombre</label>
+					<input id="nombre" name="name" type="text" required autocomplete="name" maxlength="100" class={campo} />
+				</div>
+
+				<div>
+					<label for="email" class={etiqueta}>Email</label>
+					<input
+						id="email"
+						name="email"
+						type="email"
+						required
+						autocomplete="email"
+						inputmode="email"
+						spellcheck="false"
+						class={campo}
+					/>
+					<p class="mt-1.5 text-sm text-niebla">Solo para poder responderte.</p>
+				</div>
+
+				<div>
+					<label for="mensaje" class={etiqueta}>Mensaje</label>
+					<textarea id="mensaje" name="message" required rows="7" maxlength="5000" autocomplete="off" class={campo}
+					></textarea>
+				</div>
+
+				<p class="text-sm leading-relaxed text-niebla">
+					Al enviar el formulario, tu nombre, email y mensaje se procesan mediante Web3Forms con el único fin de
+					responderte. No se usan para nada más ni se ceden a terceros. Más información en la
+					<a href="/privacidad/" class="text-senal underline underline-offset-2">política de privacidad</a>.
+				</p>
+
+				<button
+					type="submit"
+					class="boton disabled:cursor-not-allowed disabled:opacity-50"
+					disabled={!activo}
+					aria-describedby={!activo ? 'aviso-formulario' : undefined}
+				>
+					<Icon name="mail" size={18} /> Enviar mensaje
+				</button>
+			</form>
+		</div>
+	</div>
+</BaseLayout>

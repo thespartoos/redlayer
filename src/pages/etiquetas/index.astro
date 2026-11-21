@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CabeceraPagina from '../../components/CabeceraPagina.astro';
+import { getPosts } from '../../lib/posts';
+import { agruparEtiquetas } from '../../lib/agrupar';
+import { migas } from '../../lib/migas';
+
+const etiquetas = agruparEtiquetas(await getPosts());
+const title = 'Etiquetas';
+const description =
+	'Todas las etiquetas de RedLayer ordenadas alfabéticamente: herramientas, técnicas y conceptos de pentesting con el número de artículos de cada una.';
+---
+
+<BaseLayout title={title} description={description} jsonLd={[migas(['Etiquetas', '/etiquetas/'])]}>
+	<div class="mx-auto max-w-[1280px] px-4 pt-10 sm:px-6 lg:pt-14">
+		<CabeceraPagina
+			titulo="Etiquetas"
+			entradilla="Herramientas, técnicas y conceptos concretos. Para áreas más amplias, mira las categorías."
+		/>
+
+		{
+			etiquetas.length > 0 ? (
+				<ul class="mt-8 flex flex-wrap gap-2.5">
+					{etiquetas.map((t) => (
+						<li>
+							<a
+								href={`/etiquetas/${t.slug}/`}
+								class="inline-flex items-center gap-2 rounded-control border border-junta bg-casco px-3 py-1.5 text-[0.9375rem] text-tinta transition-colors hover:border-senal/60 hover:text-senal"
+							>
+								<span>{t.nombre}</span>
+								<span class="text-sm text-niebla">
+									{t.posts.length}
+									<span class="sr-only">{t.posts.length === 1 ? ' artículo' : ' artículos'}</span>
+								</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			) : (
+				<p class="panel mt-8 p-8 text-niebla">Todavía no hay etiquetas: llegarán con los primeros artículos.</p>
+			)
+		}
+	</div>
+</BaseLayout>

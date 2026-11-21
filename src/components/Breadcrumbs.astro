@@ -1,0 +1,27 @@
+---
+interface Props {
+	items: { label: string; href?: string }[];
+}
+const { items } = Astro.props;
+---
+
+<nav aria-label="Migas de pan" class="text-sm text-niebla">
+	<ol class="flex flex-wrap items-center gap-x-2 gap-y-1">
+		{
+			items.map((it, i) => (
+				<li class="flex min-w-0 items-center gap-2">
+					{i > 0 && <span aria-hidden="true" class="text-junta">/</span>}
+					{it.href ? (
+						<a href={it.href} class="hover:text-tinta">
+							{it.label}
+						</a>
+					) : (
+						<span aria-current="page" class="truncate text-tinta/80">
+							{it.label}
+						</span>
+					)}
+				</li>
+			))
+		}
+	</ol>
+</nav>

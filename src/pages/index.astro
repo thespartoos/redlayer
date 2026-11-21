@@ -1,0 +1,111 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import PostCard from '../components/PostCard.astro';
+import TerminalWhoami from '../components/TerminalWhoami.astro';
+import MasLeidos from '../components/MasLeidos.astro';
+import Newsletter from '../components/Newsletter.astro';
+import Icon from '../components/Icon.astro';
+import { getPosts } from '../lib/posts';
+import { SITE, AUTHOR } from '../consts';
+
+const posts = await getPosts();
+const destacado = posts.find((p) => p.data.featured) ?? posts[0];
+const ultimos = posts.filter((p) => p !== destacado).slice(0, 6);
+
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'WebSite',
+		name: SITE.name,
+		url: SITE.url,
+		inLanguage: 'es',
+		description: SITE.description,
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Organization',
+		name: SITE.name,
+		url: SITE.url,
+		logo: `${SITE.url}/favicon.svg`,
+		sameAs: AUTHOR.sameAs,
+	},
+];
+
+const accesos = [
+	{ href: '/articulos/', icono: 'file', texto: 'Artículos técnicos' },
+	{ href: '/series/', icono: 'book', texto: 'Series y guías' },
+	{ href: '/categorias/herramientas/', icono: 'wrench', texto: 'Herramientas' },
+] as const;
+---
+
+<BaseLayout title={SITE.title} description={SITE.description} jsonLd={jsonLd}>
+	<div class="mx-auto grid max-w-[1280px] grid-cols-[minmax(0,1fr)] gap-6 px-4 pt-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:pt-8">
+		<!-- Columna principal -->
+		<div class="min-w-0">
+			{
+				destacado ? (
+					<Hero post={destacado} />
+				) : (
+					<div class="panel p-10">
+						<h1 class="text-3xl font-bold">RedLayer</h1>
+						<p class="mt-3 text-niebla">Todavía no hay artículos publicados. El primero llega muy pronto.</p>
+					</div>
+				)
+			}
+
+			{
+				ultimos.length > 0 && (
+					<section class="mt-12" aria-labelledby="ultimos">
+						<div class="flex items-end justify-between gap-4">
+							<h2 id="ultimos" class="text-2xl font-[750] tracking-[-0.01em]">
+								Últimos artículos
+							</h2>
+							<a
+								href="/articulos/"
+								class="flex items-center gap-1.5 text-[0.9375rem] font-medium text-senal hover:underline"
+							>
+								Ver todos <Icon name="arrowRight" size={16} />
+							</a>
+						</div>
+						<div class="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+							{ultimos.map((post, i) => (
+								<PostCard post={post} prioridad={i < 3} />
+							))}
+						</div>
+					</section>
+				)
+			}
+		</div>
+
+		<!-- Sidebar -->
+		<aside class="flex flex-col gap-6" aria-label="Sobre RedLayer">
+			<section class="panel p-5">
+				<TerminalWhoami ultimo={posts[0]} />
+				<h2 class="mt-5 text-[1.0625rem] leading-snug font-bold">Pentesting explicado desde el lado del atacante.</h2>
+				<p class="mt-2 text-[0.9375rem] leading-relaxed text-niebla">
+					Técnicas reales de hacking ético, paso a paso y en español, con laboratorios que puedes montar en casa.
+				</p>
+				<ul class="mt-5 grid grid-cols-3 gap-2 border-t border-junta pt-4">
+					{
+						accesos.map(({ href, icono, texto }) => (
+							<li>
+								<a
+									href={href}
+									class="flex flex-col gap-2 rounded-control p-2 text-[0.8125rem] leading-tight font-medium text-tinta hover:bg-casco-2"
+								>
+									<span class="grid size-9 place-items-center rounded-control border border-junta text-senal">
+										<Icon name={icono} size={18} />
+									</span>
+									{texto}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+			<MasLeidos posts={posts} />
+			<Newsletter />
+		</aside>
+	</div>
+</BaseLayout>

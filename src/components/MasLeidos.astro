@@ -1,0 +1,49 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import ranking from '../data/mas-leidos.json';
+import { postUrl, readingTime, type Post } from '../lib/posts';
+interface Props {
+	posts: Post[];
+}
+const { posts } = Astro.props;
+const porSlug = new Map(posts.map((p) => [p.id, p]));
+const elegidos = ranking.slugs.map((s: string) => porSlug.get(s)).filter(Boolean) as Post[];
+for (const p of posts) if (elegidos.length < 5 && !elegidos.includes(p)) elegidos.push(p);
+---
+
+{
+	elegidos.length > 0 && (
+		<section class="panel p-5" aria-labelledby="mas-leidos">
+			<h2 id="mas-leidos" class="flex items-center gap-2 text-base font-bold">
+				<Icon name="flame" size={18} class="text-[#f97316]" />
+				Más leídos
+			</h2>
+			<ol class="mt-4 space-y-4">
+				{elegidos.slice(0, 5).map((p, i) => (
+					<li class="group relative flex items-center gap-3.5">
+						<span class="grid size-7 shrink-0 place-items-center rounded-full border border-junta text-xs font-semibold text-niebla">
+							{i + 1}
+						</span>
+						<Image
+							src={p.data.cover}
+							alt=""
+							width={112}
+							height={72}
+							class="h-[52px] w-[74px] shrink-0 rounded-md border border-junta object-cover"
+						/>
+						<div class="min-w-0">
+							<a
+								href={postUrl(p)}
+								class="line-clamp-2 text-sm leading-snug font-semibold text-tinta after:absolute after:inset-0 group-hover:text-senal"
+							>
+								{p.data.title}
+							</a>
+							<p class="mt-1 text-xs text-niebla">{readingTime(p.body)} min de lectura</p>
+						</div>
+					</li>
+				))}
+			</ol>
+		</section>
+	)
+}

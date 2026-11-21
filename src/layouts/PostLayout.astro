@@ -1,0 +1,235 @@
+---
+import type { MarkdownHeading } from 'astro';
+import { Image, getImage } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Pildora from '../components/Pildora.astro';
+import PostMeta from '../components/PostMeta.astro';
+import Toc from '../components/Toc.astro';
+import AuthorBox from '../components/AuthorBox.astro';
+import PostCard from '../components/PostCard.astro';
+import Giscus from '../components/Giscus.astro';
+import Icon from '../components/Icon.astro';
+import { CATEGORIAS } from '../data/categorias';
+import { SITE, AUTHOR } from '../consts';
+import { formatDate, postUrl, readingTime, slugify, type Post } from '../lib/posts';
+
+interface Props {
+	post: Post;
+	headings: MarkdownHeading[];
+	relacionados: Post[];
+	serie?: Post[];
+}
+const { post, headings, relacionados, serie = [] } = Astro.props;
+const { title, description, cover, coverAlt, category, date, updated, tags, difficulty, lab, series } = post.data;
+const cat = CATEGORIAS[category];
+const url = new URL(postUrl(post), SITE.url).href;
+const minutos = readingTime(post.body);
+
+// Imagen OG 1200×630 recortada desde la portada (sin servicios externos)
+const og = await getImage({ src: cover, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 80 });
+
+const dificultad = { principiante: 'Principiante', intermedio: 'Intermedio', avanzado: 'Avanzado' } as const;
+
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BlogPosting',
+		headline: title,
+		description,
+		image: [new URL(og.src, SITE.url).href],
+		datePublished: date.toISOString(),
+		dateModified: (updated ?? date).toISOString(),
+		inLanguage: 'es',
+		mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+		url,
+		articleSection: cat.nombre,
+		keywords: tags.join(', '),
+		wordCount: (post.body ?? '').split(/\s+/).filter(Boolean).length,
+		author: {
+			'@type': 'Person',
+			name: AUTHOR.name,
+			alternateName: AUTHOR.alias,
+			jobTitle: AUTHOR.jobTitle,
+			url: AUTHOR.url,
+			sameAs: AUTHOR.sameAs,
+		},
+		publisher: {
+			'@type': 'Organization',
+			name: SITE.name,
+			url: SITE.url,
+			logo: { '@type': 'ImageObject', url: `${SITE.url}/favicon.svg` },
+		},
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Inicio', item: `${SITE.url}/` },
+			{ '@type': 'ListItem', position: 2, name: cat.nombre, item: `${SITE.url}/categorias/${category}/` },
+			{ '@type': 'ListItem', position: 3, name: title, item: url },
+		],
+	},
+];
+---
+
+<BaseLayout
+	title={title}
+	description={description}
+	image={og.src}
+	imageAlt={coverAlt}
+	type="article"
+	publishedTime={date}
+	modifiedTime={updated}
+	jsonLd={jsonLd}
+>
+	<div class="mx-auto max-w-[1280px] px-4 pt-6 sm:px-6 lg:pt-8">
+		<Breadcrumbs
+			items={[
+				{ label: 'Inicio', href: '/' },
+				{ label: cat.nombre, href: `/categorias/${category}/` },
+				{ label: title },
+			]}
+		/>
+
+		<div
+			class="mt-8 grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[minmax(0,68ch)_240px] lg:justify-between xl:grid-cols-[minmax(0,68ch)_260px]"
+		>
+			<article data-pagefind-body class="min-w-0">
+				<header>
+					<div><Pildora categoria={category} enlace /></div>
+					<h1 class="mt-4 text-[2rem] leading-[1.12] font-[780] tracking-[-0.02em] text-balance sm:text-4xl">
+						{title}
+					</h1>
+					<p class="mt-4 text-lg leading-relaxed text-niebla">{description}</p>
+					<div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 border-y border-junta py-3.5">
+						<PostMeta date={date} minutos={minutos} autor={AUTHOR.name} />
+						{
+							difficulty && (
+								<span class="flex items-center gap-1.5 text-[0.8125rem] text-niebla">
+									<Icon name="gauge" size={15} />
+									{dificultad[difficulty]}
+								</span>
+							)
+						}
+						{
+							updated && (
+								<span class="text-[0.8125rem] text-niebla">
+									Actualizado el <time datetime={updated.toISOString()}>{formatDate(updated, 'larga')}</time>
+								</span>
+							)
+						}
+					</div>
+				</header>
+
+				<Image
+					src={cover}
+					alt={coverAlt}
+					widths={[720, 1100, 1400]}
+					sizes="(min-width: 1024px) 720px, 100vw"
+					loading="eager"
+					fetchpriority="high"
+					class="mt-8 aspect-[16/9] w-full rounded-tarjeta border border-junta object-cover"
+				/>
+
+				{
+					(lab || (series && serie.length > 1)) && (
+						<div class="mt-8 grid gap-4 sm:grid-cols-2">
+							{lab && (
+								<div class="panel p-4">
+									<p class="flex items-center gap-2 text-sm font-semibold">
+										<Icon name="flask" size={16} class="text-senal" />
+										Entorno de laboratorio
+									</p>
+									<p class="mt-2 text-[0.9375rem] text-niebla">{lab.entorno}</p>
+									{lab.herramientas.length > 0 && (
+										<ul class="mt-3 flex flex-wrap gap-1.5">
+											{lab.herramientas.map((h) => (
+												<li class="rounded-control border border-junta bg-casco-2 px-2 py-0.5 font-mono text-xs">
+													{h}
+												</li>
+											))}
+										</ul>
+									)}
+								</div>
+							)}
+							{series && serie.length > 1 && (
+								<div class="panel p-4">
+									<p class="flex items-center gap-2 text-sm font-semibold">
+										<Icon name="layers" size={16} class="text-senal" />
+										<span>
+											Serie:{' '}
+											<a href={`/series/${slugify(series.name)}/`} class="hover:text-senal">
+												{series.name}
+											</a>
+										</span>
+									</p>
+									<ol class="mt-2 space-y-1 text-[0.9375rem]">
+										{serie.map((p) => (
+											<li class="flex gap-2">
+												<span class="w-5 shrink-0 text-niebla">{p.data.series?.order}.</span>
+												{p.id === post.id ? (
+													<span aria-current="page" class="font-semibold text-tinta">
+														{p.data.title}
+													</span>
+												) : (
+													<a href={postUrl(p)} class="text-niebla hover:text-senal">
+														{p.data.title}
+													</a>
+												)}
+											</li>
+										))}
+									</ol>
+								</div>
+							)}
+						</div>
+					)
+				}
+
+				<div class="prosa mt-10">
+					<slot />
+				</div>
+
+				{
+					tags.length > 0 && (
+						<ul class="mt-12 flex flex-wrap gap-2" aria-label="Etiquetas" data-pagefind-ignore>
+							{tags.map((t) => (
+								<li>
+									<a
+										href={`/etiquetas/${slugify(t)}/`}
+										class="flex items-center gap-1.5 rounded-control border border-junta px-2.5 py-1 text-sm text-niebla hover:border-senal/60 hover:text-tinta"
+									>
+										<Icon name="tag" size={14} />
+										{t}
+									</a>
+								</li>
+							))}
+						</ul>
+					)
+				}
+
+				<div class="mt-10" data-pagefind-ignore><AuthorBox /></div>
+				<div data-pagefind-ignore><Giscus /></div>
+			</article>
+
+			<aside class="hidden lg:block" data-pagefind-ignore>
+				<div class="sticky top-24"><Toc headings={headings} /></div>
+			</aside>
+		</div>
+
+		{
+			relacionados.length > 0 && (
+				<section class="mt-20" aria-labelledby="relacionados" data-pagefind-ignore>
+					<h2 id="relacionados" class="text-2xl font-[750] tracking-[-0.01em]">
+						Sigue leyendo
+					</h2>
+					<div class="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+						{relacionados.map((p) => (
+							<PostCard post={p} />
+						))}
+					</div>
+				</section>
+			)
+		}
+	</div>
+</BaseLayout>

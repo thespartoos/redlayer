@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CabeceraPagina from '../../components/CabeceraPagina.astro';
+import { getPosts } from '../../lib/posts';
+import { migas } from '../../lib/migas';
+import { CATEGORIAS, type CategoriaSlug } from '../../data/categorias';
+
+const posts = await getPosts();
+const categorias = (Object.keys(CATEGORIAS) as CategoriaSlug[]).map((slug) => ({
+	slug,
+	...CATEGORIAS[slug],
+	total: posts.filter((p) => p.data.category === slug).length,
+}));
+
+const title = 'Categorías';
+const description =
+	'Explora los artículos de RedLayer por categoría: pentesting, seguridad web, explotación de binarios, malware, herramientas, redes, cloud y writeups.';
+const cuenta = (n: number) => (n === 0 ? 'Próximamente' : `${n} ${n === 1 ? 'artículo' : 'artículos'}`);
+---
+
+<BaseLayout title={title} description={description} jsonLd={[migas(['Categorías', '/categorias/'])]}>
+	<div class="mx-auto max-w-[1280px] px-4 pt-10 sm:px-6 lg:pt-14">
+		<CabeceraPagina titulo="Categorías" entradilla="Cada artículo pertenece a una categoría. Elige un área y empieza por ahí." />
+
+		<ul class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+			{
+				categorias.map((c) =>
+					c.total > 0 ? (
+						<li
+							class="group relative flex flex-col rounded-tarjeta border border-junta bg-casco p-5 transition-colors hover:border-senal/60 focus-within:border-senal/60"
+							style={`--cat:${c.color}`}
+						>
+							<span class="block h-1 w-10 rounded-full" style={`background:${c.color}`} aria-hidden="true" />
+							<h2 class="mt-4 text-lg font-bold text-tinta">
+								<a href={`/categorias/${c.slug}/`} class="after:absolute after:inset-0 focus-visible:outline-none">
+									{c.nombre}
+								</a>
+							</h2>
+							<p class="mt-2 text-[0.9375rem] leading-relaxed text-niebla">{c.descripcion}</p>
+							<p class="mt-auto pt-4 text-sm font-medium text-tinta">{cuenta(c.total)}</p>
+						</li>
+					) : (
+						<li class="flex flex-col rounded-tarjeta border border-dashed border-junta p-5 opacity-60">
+							<span class="block h-1 w-10 rounded-full" style={`background:${c.color}`} aria-hidden="true" />
+							<h2 class="mt-4 text-lg font-bold text-tinta">{c.nombre}</h2>
+							<p class="mt-2 text-[0.9375rem] leading-relaxed text-niebla">{c.descripcion}</p>
+							<p class="mt-auto pt-4 text-sm text-niebla">{cuenta(0)}</p>
+						</li>
+					),
+				)
+			}
+		</ul>
+	</div>
+</BaseLayout>

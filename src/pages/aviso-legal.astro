@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { migas } from '../lib/migas';
+import { SITE } from '../consts';
+
+const title = 'Aviso legal';
+const description =
+	'Aviso legal de RedLayer conforme a la LSSI-CE: datos del titular, condiciones de uso, propiedad intelectual y finalidad educativa del contenido publicado.';
+---
+
+<BaseLayout title={title} description={description} jsonLd={[migas(['Aviso legal', '/aviso-legal/'])]}>
+	<div class="mx-auto max-w-[1280px] px-4 pt-10 sm:px-6 lg:pt-14">
+		<article class="prosa max-w-[68ch]">
+			<header>
+				<h1 class="text-3xl leading-tight font-[750] tracking-[-0.02em] sm:text-4xl">Aviso legal</h1>
+				<p class="mt-3 text-base text-niebla">
+					Última actualización: <time datetime="2026-11-21">21 de noviembre de 2026</time>
+				</p>
+			</header>
+
+			<h2>Datos identificativos</h2>
+			<p>
+				En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información
+				y de Comercio Electrónico (LSSI-CE), se informa de los datos del titular de este sitio web:
+			</p>
+			<ul>
+				<li><strong>Titular:</strong> TODO(autor): nombre y apellidos.</li>
+				<li><strong>NIF:</strong> TODO(autor): NIF.</li>
+				<li><strong>Domicilio a efectos de notificaciones:</strong> TODO(autor): ciudad o dirección postal.</li>
+				<li><strong>Email de contacto:</strong> TODO(autor): email.</li>
+				<li><strong>Sitio web:</strong> {SITE.url.replace('https://', '')}</li>
+			</ul>
+			<p>
+				RedLayer es un blog personal sin ánimo de lucro. No vende productos ni servicios, no contiene publicidad y no
+				realiza actividad económica alguna.
+			</p>
+
+			<h2>Objeto y condiciones de uso</h2>
+			<p>
+				Este sitio web publica artículos técnicos sobre seguridad informática, pentesting y hacking ético. El acceso es
+				libre y gratuito y no requiere registro. Al navegar por el sitio aceptas este aviso legal. Te comprometes a hacer
+				un uso adecuado de los contenidos, conforme a la ley, la buena fe y el orden público.
+			</p>
+
+			<h2>Finalidad educativa del contenido</h2>
+			<p>
+				Las técnicas, herramientas y ejemplos de código que se publican en RedLayer tienen una finalidad exclusivamente
+				formativa y defensiva: entender cómo trabaja un atacante para poder detectar, prevenir y corregir
+				vulnerabilidades. Todas las demostraciones se realizan en laboratorios propios o en plataformas creadas para ese
+				fin.
+			</p>
+			<p>
+				Utilizar estas técnicas contra sistemas, redes o aplicaciones sin la autorización expresa de su titular puede
+				constituir delito en España, en particular según los
+				<strong>artículos 197 bis y 197 ter del Código Penal</strong> (acceso ilícito a sistemas de información,
+				interceptación de datos y producción o facilitación de herramientas para cometer estos delitos), además de otros
+				tipos penales aplicables.
+			</p>
+			<p>
+				El autor no se responsabiliza del mal uso que terceras personas puedan hacer de la información publicada. Quien
+				la aplique es el único responsable de contar con la autorización necesaria y de cumplir la legislación vigente.
+			</p>
+
+			<h2>Responsabilidad</h2>
+			<p>
+				El contenido se ofrece tal cual, con el mayor cuidado posible pero sin garantía de que esté libre de errores o
+				actualizado en todo momento. El titular no se hace responsable de los daños que puedan derivarse del uso de la
+				información, del código o de las configuraciones mostradas, ni de interrupciones del servicio.
+			</p>
+			<p>
+				Los enlaces a sitios de terceros se incluyen a título informativo. El titular no controla ni se hace responsable
+				de sus contenidos ni de sus políticas.
+			</p>
+
+			<h2>Propiedad intelectual</h2>
+			<p>
+				Los textos, imágenes y el diseño de este sitio son obra de su titular, salvo que se indique lo contrario. Puedes
+				citar fragmentos con enlace a la fuente original. Para cualquier otro uso, como la reproducción íntegra de
+				artículos, escribe previamente a través de la página de <a href="/contacto/">contacto</a>.
+			</p>
+			<p>
+				Los fragmentos de código de los artículos pueden reutilizarse libremente en entornos autorizados. Las marcas y
+				nombres de herramientas citados pertenecen a sus respectivos propietarios.
+			</p>
+
+			<h2>Protección de datos</h2>
+			<p>
+				El tratamiento de datos personales se describe en la <a href="/privacidad/">política de privacidad</a>.
+			</p>
+
+			<h2>Legislación aplicable</h2>
+			<p>
+				Este aviso legal se rige por la legislación española. Para cualquier controversia, las partes se someten a los
+				juzgados y tribunales que correspondan conforme a la normativa vigente.
+			</p>
+		</article>
+	</div>
+</BaseLayout>

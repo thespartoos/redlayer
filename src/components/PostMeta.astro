@@ -1,0 +1,30 @@
+---
+import Icon from './Icon.astro';
+import { formatDate } from '../lib/posts';
+interface Props {
+	date: Date;
+	minutos: number;
+	autor?: string;
+	class?: string;
+}
+const { date, minutos, autor, class: cls } = Astro.props;
+---
+
+<ul class:list={['flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[0.8125rem] text-niebla', cls]}>
+	{
+		autor && (
+			<li class="flex items-center gap-1.5">
+				<Icon name="user" size={15} />
+				<span>{autor}</span>
+			</li>
+		)
+	}
+	<li class="flex items-center gap-1.5">
+		<Icon name="clock" size={15} />
+		<span>{minutos} min de lectura</span>
+	</li>
+	<li class="flex items-center gap-1.5">
+		<Icon name="calendar" size={15} />
+		<time datetime={date.toISOString()}>{formatDate(date)}</time>
+	</li>
+</ul>

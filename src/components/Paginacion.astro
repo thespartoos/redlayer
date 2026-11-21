@@ -1,0 +1,49 @@
+---
+import Icon from './Icon.astro';
+interface Props {
+	actual: number;
+	total: number;
+	/** Ruta base con barra final, p. ej. /articulos/ */
+	base: string;
+}
+const { actual, total, base } = Astro.props;
+const url = (n: number) => (n === 1 ? base : `${base}${n}/`);
+const numeros = Array.from({ length: total }, (_, i) => i + 1);
+const clase = 'inline-flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-control border px-3 text-[0.9375rem] font-medium';
+---
+
+{
+	total > 1 && (
+		<nav aria-label="Paginación" class="mt-12 flex flex-wrap items-center justify-center gap-2">
+			{actual > 1 ? (
+				<a href={url(actual - 1)} rel="prev" class:list={[clase, 'border-junta text-tinta hover:bg-casco-2']}>
+					<Icon name="chevronLeft" size={16} />
+					Anterior
+				</a>
+			) : null}
+			<ol class="flex flex-wrap items-center gap-2">
+				{numeros.map((n) => (
+					<li>
+						{n === actual ? (
+							<a href={url(n)} aria-current="page" class:list={[clase, 'border-senal bg-senal text-senal-tinta']}>
+								<span class="sr-only">Página </span>
+								{n}
+							</a>
+						) : (
+							<a href={url(n)} class:list={[clase, 'border-junta text-tinta hover:bg-casco-2']}>
+								<span class="sr-only">Página </span>
+								{n}
+							</a>
+						)}
+					</li>
+				))}
+			</ol>
+			{actual < total ? (
+				<a href={url(actual + 1)} rel="next" class:list={[clase, 'border-junta text-tinta hover:bg-casco-2']}>
+					Siguiente
+					<Icon name="chevronRight" size={16} />
+				</a>
+			) : null}
+		</nav>
+	)
+}

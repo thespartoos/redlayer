@@ -1,0 +1,18 @@
+---
+import { CATEGORIAS, type CategoriaSlug } from '../data/categorias';
+interface Props {
+	categoria: CategoriaSlug;
+	enlace?: boolean;
+	/** Sobre una portada oscura: conserva el color claro también en modo claro */
+	sobreImagen?: boolean;
+}
+const { categoria, enlace = false, sobreImagen = false } = Astro.props;
+const c = CATEGORIAS[categoria];
+const Tag = enlace ? 'a' : 'span';
+---
+
+<Tag
+	class:list={['pildora', sobreImagen && 'sobre-imagen bg-[#0a1020]/70', enlace && 'relative z-10 hover:brightness-125']}
+	style={`--cat:${c.color}`}
+	href={enlace ? `/categorias/${categoria}/` : undefined}>{c.nombre}</Tag
+>

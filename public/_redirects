@@ -1,0 +1,23 @@
+# Redirecciones de Cloudflare (Pages / Workers Static Assets).
+# Formato: <origen> <destino> <código>, una por línea. Se aplica la primera que coincide.
+# Son 301 reales (permanentes): conservan el posicionamiento de las URL del blog antiguo
+# (thespartoos.github.io) y de las rutas en inglés.
+
+# Sitemap antiguo
+/sitemap.xml /sitemap-index.xml 301
+
+# Páginas del blog antiguo
+/about/ /sobre-mi/ 301
+/archives/ /archivo/ 301
+/categories/ /categorias/ 301
+/tags/ /etiquetas/ 301
+
+# Categorías y etiquetas antiguas
+/categories/buffer-overflow-x32/ /categorias/explotacion-binarios/ 301
+/categories/malware-development/ /categorias/malware-development/ 301
+/tags/binary-exploitation/ /categorias/explotacion-binarios/ 301
+/tags/malware-development/ /categorias/malware-development/ 301
+
+# Los posts antiguos con mayúsculas (/posts/Dll-Injection/…) solo existieron en thespartoos.github.io:
+# allí las páginas puente (fase F7) redirigen directamente a /posts/<slug-en-minúsculas>/ de este dominio.
+# No se añaden aquí para evitar un posible bucle si Cloudflare compara rutas sin distinguir mayúsculas.

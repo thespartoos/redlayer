@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { migas } from '../lib/migas';
+import { AUTHOR, SITE } from '../consts';
+
+const title = `Sobre mí: ${AUTHOR.alias}`;
+const description =
+	'Quién está detrás de RedLayer: pentester que escribe en español sobre hacking ético, seguridad web, explotación de binarios y red team con laboratorios.';
+
+const jsonLd = [
+	migas(['Sobre mí', '/sobre-mi/']),
+	{
+		'@context': 'https://schema.org',
+		'@type': 'ProfilePage',
+		url: AUTHOR.url,
+		inLanguage: 'es',
+		mainEntity: {
+			'@type': 'Person',
+			name: AUTHOR.name,
+			alternateName: AUTHOR.alias,
+			jobTitle: AUTHOR.jobTitle,
+			url: AUTHOR.url,
+			sameAs: AUTHOR.sameAs,
+			worksFor: { '@type': 'Organization', name: SITE.name, url: SITE.url },
+		},
+	},
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+	<div class="mx-auto max-w-[1280px] px-4 pt-10 sm:px-6 lg:pt-14">
+		<article class="prosa">
+			<header>
+				<h1 class="text-3xl leading-tight font-[750] tracking-[-0.02em] sm:text-4xl">Sobre mí</h1>
+				<p class="mt-3 text-lg text-niebla">
+					Soy <strong class="text-tinta">{AUTHOR.alias}</strong>, {AUTHOR.jobTitle.toLowerCase()} y autor de RedLayer.
+				</p>
+			</header>
+
+			<!-- TODO(autor): bio de 2-3 párrafos en primera persona: quién eres, cómo llegaste a la seguridad ofensiva y a qué te dedicas hoy. -->
+			<p>
+				TODO(autor): escribe aquí tu presentación. Cuenta cómo empezaste en la seguridad informática, a qué te dedicas
+				actualmente y por qué decidiste escribir sobre pentesting en español.
+			</p>
+
+			<h2>Certificaciones</h2>
+			<!-- TODO(autor): lista real de certificaciones con año (y enlace de verificación si existe). -->
+			<ul>
+				<li>TODO(autor): eJPT (eLearnSecurity Junior Penetration Tester), año.</li>
+				<li>TODO(autor): OSCP (Offensive Security Certified Professional), año.</li>
+			</ul>
+
+			<h2>Experiencia</h2>
+			<!-- TODO(autor): experiencia profesional relevante, CTF, Hack The Box, charlas, publicaciones… -->
+			<ul>
+				<li>TODO(autor): puesto o proyecto, empresa o contexto, periodo.</li>
+				<li>TODO(autor): logros en CTF o plataformas como Hack The Box y TryHackMe.</li>
+			</ul>
+
+			<h2>Qué encontrarás en RedLayer</h2>
+			<p>
+				RedLayer es un blog técnico sobre seguridad ofensiva escrito en español. Cada artículo intenta explicar no solo
+				qué comando lanzar, sino por qué funciona una técnica y cómo se detecta o se mitiga.
+			</p>
+			<ul>
+				<li>Pentesting y metodología de auditoría, del reconocimiento a la post-explotación.</li>
+				<li>Seguridad web y vulnerabilidades del OWASP Top 10 con ejemplos prácticos.</li>
+				<li>Explotación de binarios: buffer overflows, ret2libc, ROP y bypass de protecciones.</li>
+				<li>Técnicas de red team y desarrollo de malware con fines formativos.</li>
+				<li>Laboratorios reproducibles para que practiques en tu propio entorno.</li>
+			</ul>
+			<p>
+				Puedes empezar por los <a href="/articulos/">últimos artículos</a>, explorar las
+				<a href="/categorias/">categorías</a> o seguir una <a href="/series/">serie</a> en orden.
+			</p>
+
+			<h2>Ética y legalidad</h2>
+			<p>
+				Todo lo que se publica aquí tiene una finalidad educativa y defensiva. Las técnicas se muestran en laboratorios
+				propios o en plataformas diseñadas para ello. Acceder o atacar sistemas sin autorización expresa es ilegal en
+				España (artículos 197 bis y 197 ter del Código Penal) y en la mayoría de países.
+			</p>
+			<p>
+				Si encuentras una vulnerabilidad en un sistema real, notifícala de forma responsable a su propietario. Tienes más
+				detalle en el <a href="/aviso-legal/">aviso legal</a>.
+			</p>
+
+			<h2>Contacto</h2>
+			<p>
+				¿Una corrección, una propuesta de tema o una colaboración? Escríbeme desde la página de
+				<a href="/contacto/">contacto</a>.
+			</p>
+		</article>
+
+		<ul class="mt-8 flex flex-wrap gap-3">
+			<li>
+				<a href={AUTHOR.sameAs[0]} class="boton boton-borde" rel="me">
+					<Icon name="github" size={18} /> GitHub
+				</a>
+			</li>
+			<li>
+				<a href="/contacto/" class="boton boton-borde">
+					<Icon name="mail" size={18} /> Contacto
+				</a>
+			</li>
+		</ul>
+	</div>
+</BaseLayout>

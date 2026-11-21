@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CabeceraPagina from '../components/CabeceraPagina.astro';
+import Pildora from '../components/Pildora.astro';
+import { getPosts, postUrl, formatDate, type Post } from '../lib/posts';
+import { migas } from '../lib/migas';
+
+const posts = await getPosts();
+const porAnio = new Map<number, Post[]>();
+for (const p of posts) {
+	const anio = p.data.date.getUTCFullYear();
+	porAnio.set(anio, [...(porAnio.get(anio) ?? []), p]);
+}
+const anios = [...porAnio.entries()].sort((a, b) => b[0] - a[0]);
+
+const title = 'Archivo de artículos';
+const description =
+	'Archivo completo de RedLayer: todos los artículos de pentesting y hacking ético en español agrupados por año, con su fecha de publicación y categoría.';
+---
+
+<BaseLayout title={title} description={description} jsonLd={[migas(['Archivo', '/archivo/'])]}>
+	<div class="mx-auto max-w-[1280px] px-4 pt-10 sm:px-6 lg:pt-14">
+		<CabeceraPagina
+			titulo="Archivo"
+			entradilla={`${posts.length} ${posts.length === 1 ? 'artículo publicado' : 'artículos publicados'}, del más reciente al más antiguo.`}
+		/>
+
+		{
+			anios.length > 0 ? (
+				<div class="mt-8 max-w-3xl space-y-10">
+					{anios.map(([anio, lista]) => (
+						<section aria-labelledby={`anio-${anio}`}>
+							<h2 id={`anio-${anio}`} class="flex items-baseline gap-3 text-2xl font-[750] tracking-[-0.01em]">
+								{anio}
+								<span class="text-sm font-normal text-niebla">
+									{lista.length} {lista.length === 1 ? 'artículo' : 'artículos'}
+								</span>
+							</h2>
+							<ul class="mt-4 divide-y divide-junta border-y border-junta">
+								{lista.map((p) => (
+									<li class="flex flex-col gap-1.5 py-3 sm:flex-row sm:items-center sm:gap-5">
+										<time
+											datetime={p.data.date.toISOString()}
+											class="w-24 shrink-0 font-mono text-[0.8125rem] text-niebla"
+										>
+											{formatDate(p.data.date)}
+										</time>
+										<a href={postUrl(p)} class="flex-1 font-medium text-tinta hover:text-senal">
+											{p.data.draft && <span class="mr-1 text-sm font-semibold text-amber-500">[Borrador]</span>}
+											{p.data.title}
+										</a>
+										<span class="shrink-0">
+											<Pildora categoria={p.data.category} enlace />
+										</span>
+									</li>
+								))}
+							</ul>
+						</section>
+					))}
+				</div>
+			) : (
+				<p class="panel mt-8 p-8 text-niebla">Todavía no hay artículos publicados.</p>
+			)
+		}
+	</div>
+</BaseLayout>

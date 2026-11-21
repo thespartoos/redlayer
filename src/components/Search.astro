@@ -1,0 +1,94 @@
+---
+// Buscador estático Pagefind. El índice se genera tras el build (npm run build).
+// La UI se descarga solo al abrir el diálogo: 0 KB en la carga inicial.
+---
+
+<dialog
+	id="busqueda"
+	aria-label="Buscar en RedLayer"
+	class="m-auto mt-[10vh] w-[min(680px,calc(100vw-2rem))] max-h-[75vh] overflow-hidden rounded-contenedor border border-junta bg-casco p-0 text-tinta backdrop:bg-black/60 backdrop:backdrop-blur-sm"
+>
+	<div class="flex items-center justify-between border-b border-junta px-5 py-3">
+		<p class="text-sm font-semibold">Buscar artículos</p>
+		<form method="dialog">
+			<button class="rounded-control px-2 py-1 text-sm text-niebla hover:text-tinta" aria-label="Cerrar búsqueda">
+				Esc
+			</button>
+		</form>
+	</div>
+	<div id="busqueda-ui" class="max-h-[calc(75vh-52px)] overflow-y-auto p-5">
+		<p class="text-sm text-niebla" data-cargando>Cargando el buscador…</p>
+	</div>
+</dialog>
+
+<script>
+	const dialogo = document.getElementById('busqueda') as HTMLDialogElement | null;
+	let cargado = false;
+
+	async function cargar() {
+		if (cargado) return;
+		cargado = true;
+		const css = document.createElement('link');
+		css.rel = 'stylesheet';
+		css.href = '/pagefind/pagefind-ui.css';
+		document.head.append(css);
+		try {
+			await new Promise<void>((ok, ko) => {
+				const s = document.createElement('script');
+				s.src = '/pagefind/pagefind-ui.js';
+				s.onload = () => ok();
+				s.onerror = () => ko();
+				document.head.append(s);
+			});
+			document.querySelector('#busqueda-ui [data-cargando]')?.remove();
+			// @ts-expect-error global de Pagefind
+			new window.PagefindUI({
+				element: '#busqueda-ui',
+				showSubResults: true,
+				showImages: false,
+				resetStyles: false,
+				autofocus: true,
+			});
+		} catch {
+			const aviso = document.querySelector('#busqueda-ui [data-cargando]');
+			if (aviso)
+				aviso.textContent =
+					'El índice de búsqueda solo existe en la versión compilada. Ejecuta npm run build y npm run preview.';
+		}
+	}
+
+	function abrir() {
+		if (!dialogo) return;
+		dialogo.showModal();
+		cargar().then(() => (dialogo.querySelector('input') as HTMLInputElement | null)?.focus());
+	}
+
+	document.querySelectorAll('[data-abrir-busqueda]').forEach((b) => b.addEventListener('click', abrir));
+	document.addEventListener('keydown', (e) => {
+		if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+			e.preventDefault();
+			abrir();
+		}
+	});
+	dialogo?.addEventListener('click', (e) => {
+		if (e.target === dialogo) dialogo.close();
+	});
+</script>
+
+<style is:global>
+	#busqueda-ui {
+		--pagefind-ui-scale: 0.85;
+		--pagefind-ui-primary: var(--senal);
+		--pagefind-ui-text: var(--tinta);
+		--pagefind-ui-background: var(--casco);
+		--pagefind-ui-border: var(--junta);
+		--pagefind-ui-tag: var(--casco-2);
+		--pagefind-ui-border-width: 1px;
+		--pagefind-ui-border-radius: 6px;
+		--pagefind-ui-font: var(--font-sans);
+	}
+	#busqueda-ui mark {
+		background: color-mix(in srgb, var(--senal) 30%, transparent);
+		color: inherit;
+	}
+</style>

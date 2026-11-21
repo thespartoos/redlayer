@@ -1,0 +1,59 @@
+---
+import type { MarkdownHeading } from 'astro';
+interface Props {
+	headings: MarkdownHeading[];
+}
+const items = Astro.props.headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+	items.length > 1 && (
+		<nav aria-labelledby="toc-titulo" class="text-sm" data-toc>
+			<p id="toc-titulo" class="font-semibold text-tinta">
+				En este artículo
+			</p>
+			<ul class="mt-3 space-y-1 border-l border-junta">
+				{items.map((h) => (
+					<li>
+						<a
+							href={`#${h.slug}`}
+							data-toc-link={h.slug}
+							class:list={[
+								'-ml-px block border-l-2 border-transparent py-1 leading-snug text-niebla hover:text-tinta',
+								h.depth === 3 ? 'pl-7' : 'pl-4',
+							]}
+						>
+							{h.text}
+						</a>
+					</li>
+				))}
+			</ul>
+		</nav>
+	)
+}
+
+<script>
+	const enlaces = new Map(
+		[...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')].map((a) => [a.dataset.tocLink!, a]),
+	);
+	if (enlaces.size) {
+		const marcar = (id: string) => {
+			enlaces.forEach((a, k) => {
+				const on = k === id;
+				a.classList.toggle('!border-senal', on);
+				a.classList.toggle('!text-senal', on);
+				if (on) a.setAttribute('aria-current', 'location');
+				else a.removeAttribute('aria-current');
+			});
+		};
+		const titulos = [...enlaces.keys()].map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+		const obs = new IntersectionObserver(
+			(entradas) => {
+				const visible = entradas.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+				if (visible) marcar(visible.target.id);
+			},
+			{ rootMargin: '-80px 0px -65% 0px' },
+		);
+		titulos.forEach((t) => obs.observe(t));
+	}
+</script>

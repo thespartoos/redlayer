@@ -1,0 +1,23 @@
+---
+// Marca RedLayer: tres capas apiladas, la superior en rojo (la "capa ofensiva").
+interface Props {
+	size?: number;
+	conTexto?: boolean;
+}
+const { size = 34, conTexto = true } = Astro.props;
+---
+
+<span class="inline-flex items-center gap-2.5">
+	<svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true" class="shrink-0">
+		<path d="M20 25.5 5 19l4-1.8L20 22l11-4.8 4 1.8z" fill="currentColor" opacity=".35"></path>
+		<path d="M20 31.5 5 25l4-1.8L20 28l11-4.8 4 1.8z" fill="currentColor" opacity=".2"></path>
+		<path d="M20 6 5 12.5 20 19l15-6.5z" fill="#ef4444"></path>
+	</svg>
+	{
+		conTexto && (
+			<span class="text-[1.375rem] font-[750] tracking-[-0.02em] leading-none">
+				Red<span class="font-[450]">Layer</span>
+			</span>
+		)
+	}
+</span>

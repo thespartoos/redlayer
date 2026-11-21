@@ -1,0 +1,41 @@
+---
+import { Image } from 'astro:assets';
+import Pildora from './Pildora.astro';
+import PostMeta from './PostMeta.astro';
+import { postUrl, readingTime, type Post } from '../lib/posts';
+interface Props {
+	post: Post;
+	/** true en las primeras tarjetas visibles para no retrasar el LCP */
+	prioridad?: boolean;
+	nivel?: 'h2' | 'h3';
+}
+const { post, prioridad = false, nivel = 'h3' } = Astro.props;
+const { title, description, cover, coverAlt, category, date, draft } = post.data;
+const Titulo = nivel;
+---
+
+<article
+	class="group relative flex flex-col overflow-hidden rounded-tarjeta border border-junta bg-casco transition-colors hover:border-senal/60 focus-within:border-senal/60"
+>
+	<div class="relative aspect-[16/9] overflow-hidden border-b border-junta bg-casco-2">
+		<Image
+			src={cover}
+			alt={coverAlt}
+			widths={[400, 640, 800]}
+			sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw"
+			loading={prioridad ? 'eager' : 'lazy'}
+			class="h-full w-full object-cover"
+		/>
+		<div class="absolute top-3 left-3"><Pildora categoria={category} sobreImagen /></div>
+	</div>
+	<div class="flex flex-1 flex-col p-5">
+		<Titulo class="text-[1.1875rem] leading-snug font-bold tracking-[-0.01em] text-tinta">
+			<a href={postUrl(post)} class="after:absolute after:inset-0 focus-visible:outline-none">
+				{draft && <span class="mr-1 text-sm font-semibold text-amber-500">[Borrador]</span>}
+				{title}
+			</a>
+		</Titulo>
+		<p class="mt-2.5 line-clamp-3 text-[0.9375rem] leading-relaxed text-niebla">{description}</p>
+		<PostMeta date={date} minutos={readingTime(post.body)} class="mt-auto pt-5" />
+	</div>
+</article>

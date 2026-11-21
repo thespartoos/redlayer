@@ -1,0 +1,51 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CabeceraPagina from '../../components/CabeceraPagina.astro';
+import PostCard from '../../components/PostCard.astro';
+import Pildora from '../../components/Pildora.astro';
+import { getPosts, type Post } from '../../lib/posts';
+import { migas } from '../../lib/migas';
+import { CATEGORIAS, type CategoriaSlug } from '../../data/categorias';
+
+export const getStaticPaths = (async () => {
+	const posts = await getPosts();
+	return (Object.keys(CATEGORIAS) as CategoriaSlug[])
+		.map((cat) => ({ cat, posts: posts.filter((p) => p.data.category === cat) }))
+		.filter((x) => x.posts.length > 0)
+		.map(({ cat, posts }) => ({ params: { cat }, props: { cat, posts } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+	cat: CategoriaSlug;
+	posts: Post[];
+}
+const { cat, posts } = Astro.props;
+const c = CATEGORIAS[cat];
+
+const title = `${c.nombre}: artículos en español`;
+// La descripción de categorias.ts es corta: se completa con la coletilla más larga que quepa en 160.
+const coletillas = [
+	` Guías y laboratorios de ${c.nombre.toLowerCase()} en español, explicados paso a paso en RedLayer.`,
+	` Guías y laboratorios en español, paso a paso, en RedLayer.`,
+	` Artículos en español en RedLayer.`,
+];
+const description = coletillas.map((s) => c.descripcion + s).find((d) => d.length <= 160) ?? c.descripcion;
+const jsonLd = [migas(['Categorías', '/categorias/'], [c.nombre, `/categorias/${cat}/`])];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+	<div class="mx-auto max-w-[1280px] px-4 pt-10 sm:px-6 lg:pt-14">
+		<CabeceraPagina titulo={c.nombre} entradilla={c.descripcion}>
+			<div slot="antes" class="mb-4"><Pildora categoria={cat} /></div>
+			<p class="mt-2 text-sm text-niebla">
+				{posts.length} {posts.length === 1 ? 'artículo' : 'artículos'} ·
+				<a href="/categorias/" class="text-senal hover:underline">todas las categorías</a>
+			</p>
+		</CabeceraPagina>
+
+		<div class="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+			{posts.map((post, i) => <PostCard post={post} nivel="h2" prioridad={i < 3} />)}
+		</div>
+	</div>
+</BaseLayout>

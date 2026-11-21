@@ -1,0 +1,57 @@
+---
+import type { GetStaticPaths, Page } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CabeceraPagina from '../../components/CabeceraPagina.astro';
+import PostCard from '../../components/PostCard.astro';
+import Paginacion from '../../components/Paginacion.astro';
+import { getPosts, type Post } from '../../lib/posts';
+import { migas } from '../../lib/migas';
+import { POSTS_PER_PAGE } from '../../consts';
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const posts = await getPosts();
+	return paginate(posts, { pageSize: POSTS_PER_PAGE });
+}) satisfies GetStaticPaths;
+
+interface Props {
+	page: Page<Post>;
+}
+const { page } = Astro.props;
+const n = page.currentPage;
+const primera = n === 1;
+
+const title = primera ? 'Artículos' : `Artículos — página ${n}`;
+const description = primera
+	? 'Todos los artículos de RedLayer sobre pentesting, seguridad web, explotación de binarios y red team, del más reciente al más antiguo.'
+	: `Página ${n} de ${page.lastPage} del listado de artículos de RedLayer: pentesting, seguridad web, explotación de binarios y red team en español.`;
+const ruta = primera ? '/articulos/' : `/articulos/${n}/`;
+const jsonLd = [primera ? migas(['Artículos', '/articulos/']) : migas(['Artículos', '/articulos/'], [`Página ${n}`, ruta])];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+	<div class="mx-auto max-w-[1280px] px-4 pt-10 sm:px-6 lg:pt-14">
+		<CabeceraPagina
+			titulo={primera ? 'Artículos' : `Artículos, página ${n}`}
+			entradilla="Guías técnicas de hacking ético en español, con laboratorios que puedes reproducir en casa."
+		>
+			<p class="mt-2 text-sm text-niebla">
+				{page.total} {page.total === 1 ? 'artículo' : 'artículos'}
+				{page.lastPage > 1 && ` · página ${n} de ${page.lastPage}`}
+			</p>
+		</CabeceraPagina>
+
+		{
+			page.data.length > 0 ? (
+				<div class="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+					{page.data.map((post, i) => (
+						<PostCard post={post} nivel="h2" prioridad={primera && i < 3} />
+					))}
+				</div>
+			) : (
+				<p class="panel mt-8 p-8 text-niebla">Todavía no hay artículos publicados. El primero llega muy pronto.</p>
+			)
+		}
+
+		<Paginacion actual={n} total={page.lastPage} base="/articulos/" />
+	</div>
+</BaseLayout>

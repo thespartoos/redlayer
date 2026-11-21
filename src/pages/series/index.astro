@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CabeceraPagina from '../../components/CabeceraPagina.astro';
+import { getPosts, postUrl, formatDate } from '../../lib/posts';
+import { agruparSeries } from '../../lib/agrupar';
+import { migas } from '../../lib/migas';
+
+const series = agruparSeries(await getPosts());
+const title = 'Series y guías';
+const description =
+	'Series de artículos de RedLayer pensadas para leerse en orden: rutas de aprendizaje de pentesting y hacking ético en español, de lo básico a lo avanzado.';
+---
+
+<BaseLayout title={title} description={description} jsonLd={[migas(['Series', '/series/'])]}>
+	<div class="mx-auto max-w-[1280px] px-4 pt-10 sm:px-6 lg:pt-14">
+		<CabeceraPagina
+			titulo="Series y guías"
+			entradilla="Artículos encadenados que se leen en orden. Cada parte da por hecho lo visto en la anterior."
+		/>
+
+		{
+			series.length > 0 ? (
+				<div class="mt-8 grid gap-5 lg:grid-cols-2">
+					{series.map((s) => (
+						<section class="panel p-6" aria-labelledby={`serie-${s.slug}`}>
+							<div class="flex items-baseline justify-between gap-4">
+								<h2 id={`serie-${s.slug}`} class="text-xl font-bold text-tinta">
+									<a href={`/series/${s.slug}/`} class="hover:text-senal">
+										{s.nombre}
+									</a>
+								</h2>
+								<p class="shrink-0 text-sm text-niebla">
+									{s.posts.length} {s.posts.length === 1 ? 'parte' : 'partes'}
+								</p>
+							</div>
+							<ol class="mt-4 space-y-1 border-t border-junta pt-4">
+								{s.posts.map((p) => (
+									<li class="flex gap-3">
+										<span class="w-6 shrink-0 pt-2 text-right font-mono text-sm text-niebla" aria-hidden="true">
+											{p.data.series?.order}
+										</span>
+										<a href={postUrl(p)} class="flex-1 rounded-control px-2 py-1.5 hover:bg-casco-2">
+											<span class="block font-medium text-tinta">{p.data.title}</span>
+											<time datetime={p.data.date.toISOString()} class="text-sm text-niebla">
+												{formatDate(p.data.date)}
+											</time>
+										</a>
+									</li>
+								))}
+							</ol>
+						</section>
+					))}
+				</div>
+			) : (
+				<p class="panel mt-8 p-8 text-niebla">Todavía no hay series publicadas.</p>
+			)
+		}
+	</div>
+</BaseLayout>

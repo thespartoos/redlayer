@@ -1,0 +1,45 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CabeceraPagina from '../../components/CabeceraPagina.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPosts, type Post } from '../../lib/posts';
+import { agruparEtiquetas } from '../../lib/agrupar';
+import { migas } from '../../lib/migas';
+
+export const getStaticPaths = (async () => {
+	const etiquetas = agruparEtiquetas(await getPosts());
+	return etiquetas.map((t) => ({ params: { tag: t.slug }, props: { nombre: t.nombre, posts: t.posts } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+	nombre: string;
+	posts: Post[];
+}
+const { nombre, posts } = Astro.props;
+const { tag } = Astro.params;
+const n = posts.length;
+const cuenta = `${n} ${n === 1 ? 'artículo' : 'artículos'}`;
+
+const title = `Artículos sobre ${nombre}`;
+// Con etiquetas largas se usa la variante corta para no pasar de ~160 caracteres.
+const description = [
+	`${cuenta} de RedLayer con la etiqueta «${nombre}»: guías de pentesting y hacking ético en español con laboratorios reproducibles.`,
+	`${cuenta} de RedLayer con la etiqueta «${nombre}»: pentesting y hacking ético en español.`,
+].find((d) => d.length <= 160) ?? `Artículos de RedLayer con la etiqueta «${nombre}».`;
+const jsonLd = [migas(['Etiquetas', '/etiquetas/'], [nombre, `/etiquetas/${tag}/`])];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+	<div class="mx-auto max-w-[1280px] px-4 pt-10 sm:px-6 lg:pt-14">
+		<CabeceraPagina titulo={`Etiqueta: ${nombre}`}>
+			<p class="mt-3 text-sm text-niebla">
+				{cuenta} · <a href="/etiquetas/" class="text-senal hover:underline">todas las etiquetas</a>
+			</p>
+		</CabeceraPagina>
+
+		<div class="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+			{posts.map((post, i) => <PostCard post={post} nivel="h2" prioridad={i < 3} />)}
+		</div>
+	</div>
+</BaseLayout>

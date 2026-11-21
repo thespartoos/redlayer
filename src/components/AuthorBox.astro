@@ -1,0 +1,25 @@
+---
+import Icon from './Icon.astro';
+import { AUTHOR } from '../consts';
+---
+
+<section class="panel flex gap-4 p-5 sm:p-6" aria-label="Sobre el autor">
+	<div class="grid size-14 shrink-0 place-items-center rounded-full border border-junta bg-casco-2 text-xl font-bold text-senal">
+		{AUTHOR.name.charAt(0).toUpperCase()}
+	</div>
+	<div>
+		<p class="text-sm text-niebla">Escrito por</p>
+		<p class="text-lg font-bold">
+			<a href="/sobre-mi/" rel="author" class="hover:text-senal">{AUTHOR.name}</a>
+		</p>
+		<p class="mt-1.5 text-[0.9375rem] leading-relaxed text-niebla">
+			{AUTHOR.jobTitle}. Escribo sobre pentesting, explotación y red team con laboratorios que puedes reproducir.
+		</p>
+		<div class="mt-3 flex gap-3 text-sm">
+			<a href={AUTHOR.sameAs[0]} class="flex items-center gap-1.5 text-niebla hover:text-tinta">
+				<Icon name="github" size={16} /> GitHub
+			</a>
+			<a href="/sobre-mi/" class="text-senal hover:underline">Más sobre mí</a>
+		</div>
+	</div>
+</section>

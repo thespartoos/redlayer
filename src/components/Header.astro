@@ -1,0 +1,118 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { NAV } from '../consts';
+
+const actual = Astro.url.pathname;
+const activo = (href: string) => (href === '/' ? actual === '/' : actual.startsWith(href));
+---
+
+<a
+	href="#contenido"
+	class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 boton">Saltar al contenido</a
+>
+
+<header class="sticky top-0 z-40 border-b border-junta bg-abismo/85 backdrop-blur-md">
+	<div class="mx-auto flex h-16 max-w-[1280px] items-center gap-6 px-4 sm:px-6">
+		<a href="/" class="text-tinta" aria-label="RedLayer, ir al inicio">
+			<Logo />
+		</a>
+
+		<nav aria-label="Principal" class="ml-6 hidden lg:block">
+			<ul class="flex items-center gap-1">
+				{
+					NAV.map(({ href, label }) => (
+						<li>
+							<a
+								href={href}
+								aria-current={activo(href) ? 'page' : undefined}
+								class:list={[
+									'relative block rounded-control px-3 py-2 text-[0.9375rem] transition-colors',
+									activo(href)
+										? 'text-senal after:absolute after:inset-x-3 after:-bottom-[13px] after:h-0.5 after:rounded after:bg-senal'
+										: 'text-niebla hover:text-tinta',
+								]}
+							>
+								{label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+
+		<div class="ml-auto flex items-center gap-1">
+			<button
+				type="button"
+				data-abrir-busqueda
+				class="flex items-center gap-2 rounded-control px-2.5 py-2 text-niebla hover:text-tinta"
+				aria-label="Buscar (Ctrl+K)"
+			>
+				<Icon name="search" size={19} />
+				<kbd class="hidden rounded border border-junta px-1.5 font-sans text-xs text-niebla xl:inline">Ctrl K</kbd>
+			</button>
+			<button
+				type="button"
+				id="cambiar-tema"
+				class="rounded-control p-2 text-niebla hover:text-tinta"
+				aria-label="Cambiar entre modo claro y oscuro"
+			>
+				<Icon name="moon" size={19} class="hidden dark:block" />
+				<Icon name="sun" size={19} class="block dark:hidden" />
+			</button>
+			<a href="/#newsletter" class="boton boton-borde ml-2 hidden !py-2 sm:inline-flex">
+				<Icon name="mail" size={17} />
+				Suscribirme
+			</a>
+			<button
+				type="button"
+				id="abrir-menu"
+				class="rounded-control p-2 text-niebla hover:text-tinta lg:hidden"
+				aria-expanded="false"
+				aria-controls="menu-movil"
+				aria-label="Abrir menú"
+			>
+				<Icon name="menu" size={22} />
+			</button>
+		</div>
+	</div>
+
+	<nav id="menu-movil" aria-label="Menú móvil" class="hidden border-t border-junta bg-abismo lg:hidden">
+		<ul class="mx-auto max-w-[1280px] px-4 py-3">
+			{
+				NAV.map(({ href, label }) => (
+					<li>
+						<a
+							href={href}
+							aria-current={activo(href) ? 'page' : undefined}
+							class:list={[
+								'block rounded-control px-3 py-3 text-base',
+								activo(href) ? 'bg-casco text-senal' : 'text-tinta',
+							]}
+						>
+							{label}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</nav>
+</header>
+
+<script>
+	const raiz = document.documentElement;
+	document.getElementById('cambiar-tema')?.addEventListener('click', () => {
+		const oscuro = raiz.classList.toggle('dark');
+		try {
+			localStorage.setItem('tema', oscuro ? 'oscuro' : 'claro');
+		} catch {}
+	});
+
+	const boton = document.getElementById('abrir-menu');
+	const menu = document.getElementById('menu-movil');
+	boton?.addEventListener('click', () => {
+		const abierto = menu?.classList.toggle('hidden') === false;
+		boton.setAttribute('aria-expanded', String(abierto));
+		boton.setAttribute('aria-label', abierto ? 'Cerrar menú' : 'Abrir menú');
+	});
+</script>

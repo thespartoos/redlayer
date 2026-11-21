@@ -1,0 +1,112 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { migas } from '../lib/migas';
+
+const title = 'Política de privacidad';
+const description =
+	'Cómo trata RedLayer tus datos según el RGPD: analítica sin cookies, newsletter con doble opt-in, comentarios, formulario de contacto y tus derechos.';
+---
+
+<BaseLayout title={title} description={description} jsonLd={[migas(['Privacidad', '/privacidad/'])]}>
+	<div class="mx-auto max-w-[1280px] px-4 pt-10 sm:px-6 lg:pt-14">
+		<article class="prosa max-w-[68ch]">
+			<header>
+				<h1 class="text-3xl leading-tight font-[750] tracking-[-0.02em] sm:text-4xl">Política de privacidad</h1>
+				<p class="mt-3 text-base text-niebla">
+					Última actualización: <time datetime="2026-11-21">21 de noviembre de 2026</time>
+				</p>
+			</header>
+
+			<p>
+				Esta política explica qué datos personales se tratan en RedLayer, para qué y con qué base legal, de acuerdo con
+				el Reglamento (UE) 2016/679 (RGPD), la Ley Orgánica 3/2018 de Protección de Datos Personales y garantía de los
+				derechos digitales (LOPDGDD) y la LSSI-CE. Resumen: se recogen los mínimos datos posibles y no se usan cookies de
+				seguimiento.
+			</p>
+
+			<h2>Responsable del tratamiento</h2>
+			<ul>
+				<li><strong>Responsable:</strong> TODO(autor): nombre y apellidos.</li>
+				<li><strong>NIF:</strong> TODO(autor): NIF.</li>
+				<li><strong>Email:</strong> TODO(autor): email para asuntos de privacidad.</li>
+			</ul>
+			<p>RedLayer es un blog personal sin ánimo de lucro.</p>
+
+			<h2>Analítica web</h2>
+			<p>
+				Para conocer qué artículos se leen se usa <strong>Cloudflare Web Analytics</strong>, una herramienta que no
+				instala cookies, no usa almacenamiento local y no identifica a los visitantes ni crea perfiles. Solo recoge datos
+				agregados como la página visitada, el país aproximado o el tipo de navegador. La base legal es el interés legítimo
+				(art. 6.1.f RGPD) en conocer el uso del sitio para mejorarlo.
+			</p>
+
+			<h2>Newsletter</h2>
+			<p>
+				Si te suscribes, tu email se gestiona con <strong>Brevo</strong> (Sendinblue SAS, Francia), con servidores en la
+				Unión Europea. La suscripción usa <strong>doble opt-in</strong>: no se te envía nada hasta que confirmas desde
+				el enlace que recibirás por correo.
+			</p>
+			<ul>
+				<li><strong>Finalidad:</strong> enviarte los nuevos artículos y novedades del blog.</li>
+				<li><strong>Base legal:</strong> tu consentimiento (art. 6.1.a RGPD), que puedes retirar cuando quieras.</li>
+				<li>
+					<strong>Conservación:</strong> hasta que te des de baja, con el enlace que aparece en todos los correos.
+				</li>
+			</ul>
+
+			<h2>Comentarios</h2>
+			<p>
+				Los comentarios de los artículos funcionan con <strong>Giscus</strong>, que guarda cada comentario como una
+				discusión pública de GitHub. Para comentar necesitas iniciar sesión con tu cuenta de GitHub, y el tratamiento de
+				esos datos se rige por la política de privacidad de GitHub, Inc. Si no comentas, Giscus solo carga los
+				comentarios existentes. La base legal es tu consentimiento al decidir comentar.
+			</p>
+
+			<h2>Formulario de contacto</h2>
+			<p>
+				El <a href="/contacto/">formulario de contacto</a> se envía a través de <strong>Web3Forms</strong>, que reenvía
+				el mensaje por correo electrónico. Los datos que facilitas (nombre, email y mensaje) se usan solo para
+				responderte. La base legal es tu consentimiento al enviar el formulario. Los mensajes se conservan el tiempo
+				necesario para atender la consulta y después se eliminan.
+			</p>
+
+			<h2>Alojamiento</h2>
+			<p>
+				El sitio está alojado en <strong>Cloudflare</strong> (Cloudflare, Inc.), que por motivos de seguridad y
+				funcionamiento puede tratar datos técnicos como la dirección IP para entregar las páginas y proteger el sitio
+				frente a ataques. La base legal es el interés legítimo en mantener el servicio seguro y disponible.
+			</p>
+
+			<h2>Transferencias internacionales</h2>
+			<p>
+				Algunos de estos proveedores (Cloudflare, GitHub y Web3Forms) pueden tratar datos fuera del Espacio Económico
+				Europeo. Estas transferencias se amparan en el Marco de Privacidad de Datos UE-EE. UU. o en las cláusulas
+				contractuales tipo aprobadas por la Comisión Europea.
+			</p>
+
+			<h2>Cookies</h2>
+			<p>
+				RedLayer no usa cookies propias ni de terceros con fines analíticos o publicitarios. Solo se guarda en tu
+				navegador, mediante almacenamiento local, tu preferencia de tema claro u oscuro, que nunca sale de tu
+				dispositivo.
+			</p>
+
+			<h2>Tus derechos</h2>
+			<p>
+				Puedes ejercer en cualquier momento tus derechos de acceso, rectificación, supresión, oposición, limitación del
+				tratamiento y portabilidad (derechos ARSOPL) escribiendo al email indicado arriba. Indica qué derecho quieres
+				ejercer y, si es necesario, se te pedirá acreditar tu identidad.
+			</p>
+			<p>
+				Si consideras que tus datos no se han tratado correctamente, puedes presentar una reclamación ante la
+				<a href="https://www.aepd.es/">Agencia Española de Protección de Datos (AEPD)</a>.
+			</p>
+
+			<h2>Cambios en esta política</h2>
+			<p>
+				Si cambia algún servicio o la forma de tratar los datos, esta página se actualizará y se indicará la nueva fecha
+				arriba.
+			</p>
+		</article>
+	</div>
+</BaseLayout>

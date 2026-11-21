@@ -1,0 +1,59 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { CATEGORIAS } from '../data/categorias';
+import { AUTHOR } from '../consts';
+
+const anio = new Date().getFullYear();
+const categorias = Object.entries(CATEGORIAS).slice(0, 6);
+---
+
+<footer class="mt-24 border-t border-junta">
+	<div class="mx-auto grid max-w-[1280px] gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
+		<div class="max-w-sm">
+			<a href="/" class="text-tinta" aria-label="RedLayer, ir al inicio"><Logo size={30} /></a>
+			<p class="mt-4 text-[0.9375rem] leading-relaxed text-niebla">
+				Pentesting, seguridad web y explotación explicados en español, con laboratorios que puedes reproducir.
+			</p>
+			<div class="mt-5 flex gap-2">
+				<a href={AUTHOR.sameAs[0]} class="rounded-control p-2 text-niebla hover:text-tinta" aria-label="GitHub">
+					<Icon name="github" size={20} />
+				</a>
+				<a href="/feed.xml" class="rounded-control p-2 text-niebla hover:text-tinta" aria-label="Feed RSS">
+					<Icon name="rss" size={20} />
+				</a>
+			</div>
+		</div>
+
+		<nav aria-label="Categorías">
+			<h2 class="text-sm font-semibold text-tinta">Categorías</h2>
+			<ul class="mt-4 space-y-2.5 text-[0.9375rem]">
+				{
+					categorias.map(([slug, c]) => (
+						<li>
+							<a href={`/categorias/${slug}/`} class="text-niebla hover:text-tinta">
+								{c.nombre}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+
+		<nav aria-label="El sitio">
+			<h2 class="text-sm font-semibold text-tinta">El sitio</h2>
+			<ul class="mt-4 space-y-2.5 text-[0.9375rem]">
+				<li><a href="/sobre-mi/" class="text-niebla hover:text-tinta">Sobre mí</a></li>
+				<li><a href="/archivo/" class="text-niebla hover:text-tinta">Archivo</a></li>
+				<li><a href="/contacto/" class="text-niebla hover:text-tinta">Contacto</a></li>
+				<li><a href="/aviso-legal/" class="text-niebla hover:text-tinta">Aviso legal</a></li>
+				<li><a href="/privacidad/" class="text-niebla hover:text-tinta">Privacidad</a></li>
+			</ul>
+		</nav>
+	</div>
+	<div class="border-t border-junta">
+		<p class="mx-auto max-w-[1280px] px-4 py-6 text-sm text-niebla sm:px-6">
+			© {anio} RedLayer. Contenido con fines educativos: practica solo en sistemas propios o con autorización.
+		</p>
+	</div>
+</footer>

@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import Icon from '../components/Icon.astro';
+import { getPosts } from '../lib/posts';
+import { migas } from '../lib/migas';
+
+const ultimos = (await getPosts()).slice(0, 3);
+
+const title = 'Página no encontrada';
+const description =
+	'Esta página de RedLayer no existe o ha cambiado de dirección. Usa el buscador o vuelve a los artículos de pentesting y hacking ético en español.';
+---
+
+<BaseLayout title={title} description={description} noindex jsonLd={[migas(['Página no encontrada', '/404/'])]}>
+	<div class="mx-auto max-w-[1280px] px-4 pt-10 sm:px-6 lg:pt-16">
+		<div class="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
+			<div class="max-w-[60ch]">
+				<p class="font-mono text-sm text-niebla">Error 404</p>
+				<h1 class="mt-2 text-3xl leading-tight font-[750] tracking-[-0.02em] sm:text-4xl">
+					Esta página no existe o ha cambiado de dirección
+				</h1>
+				<p class="mt-4 text-lg leading-relaxed text-niebla">
+					Puede que el enlace esté mal escrito o que el artículo se haya movido al renovar el blog. Prueba a buscarlo o
+					sigue por alguno de estos caminos.
+				</p>
+				<div class="mt-6 flex flex-wrap gap-3">
+					<button type="button" data-abrir-busqueda class="boton">
+						<Icon name="search" size={18} /> Buscar en el blog
+					</button>
+					<a href="/articulos/" class="boton boton-borde">Ver artículos</a>
+					<a href="/" class="boton boton-borde">Ir al inicio</a>
+				</div>
+			</div>
+
+			<div
+				class="overflow-hidden rounded-tarjeta border border-junta font-mono text-sm"
+				style="background:var(--terminal-bg);color:var(--terminal-tinta)"
+				aria-hidden="true"
+			>
+				<div class="flex gap-1.5 border-b border-white/10 px-4 py-3">
+					<span class="size-2.5 rounded-full bg-[#f87171]"></span>
+					<span class="size-2.5 rounded-full bg-[#f5b544]"></span>
+					<span class="size-2.5 rounded-full bg-[#34d399]"></span>
+				</div>
+				<pre class="overflow-x-auto px-4 py-4 leading-relaxed"><span class="text-[#4ade80]">$</span> cat pagina
+cat: pagina: No such file or directory
+<span class="text-[#4ade80]">$</span> <span class="opacity-60">_</span></pre>
+			</div>
+		</div>
+
+		{
+			ultimos.length > 0 && (
+				<section class="mt-16" aria-labelledby="recientes">
+					<div class="flex items-end justify-between gap-4">
+						<h2 id="recientes" class="text-2xl font-[750] tracking-[-0.01em]">
+							Últimos artículos
+						</h2>
+						<a
+							href="/articulos/"
+							class="flex items-center gap-1.5 text-[0.9375rem] font-medium text-senal hover:underline"
+						>
+							Ver todos <Icon name="arrowRight" size={16} />
+						</a>
+					</div>
+					<div class="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+						{ultimos.map((post) => (
+							<PostCard post={post} />
+						))}
+					</div>
+				</section>
+			)
+		}
+	</div>
+</BaseLayout>

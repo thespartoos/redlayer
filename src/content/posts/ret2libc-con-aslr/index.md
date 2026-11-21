@@ -1,11 +1,11 @@
 ---
 title: "Buffer Overflow Ret2libc con ASLR"
-description: "TODO"
+description: "Explotación de buffer overflow con Ret2libc en Linux x32 con ASLR activado: offset del EIP, offsets de libc y fuerza bruta de la dirección base."
 date: 2023-10-24
 category: explotacion-binarios
 tags: [binary-exploitation]
 cover: ./img/aslr-portada.png
-coverAlt: "TODO"
+coverAlt: "Portada del artículo sobre Ret2libc con ASLR en Linux x32"
 series:
   name: "Buffer Overflow x32"
   order: 3
@@ -41,13 +41,13 @@ echo 2 > /proc/sys/kernel/randomize_va_space
 
 El resultado de dicha comando dará lugar aleatorice las direcciones de la memoria que añade una capa de seguridad para la explotacion del buffer overflow.
 
-![ALT_TODO:ldd.png](./img/ldd.png)
+![Salida de ldd con la dirección de libc cambiando en cada ejecución](./img/ldd.png)
 
 Si nos fijamos bien en la segunda línea del output contiene la dirección de memoria de libc y comprobamos que **NO** es la misma en cada ejecución.
 
 ## Funcionamiento del programa vulnerable
 
-![ALT_TODO:code_vuln.png](./img/code_vuln.png)
+![Código fuente en C del programa vulnerable con strcpy](./img/code_vuln.png)
 
 Este sería el codigo correspondiente al binario compilado al que se va a explotar un buffer overflow a través de la técnica de Ret2libc.
 
@@ -77,7 +77,7 @@ Una vez hecho esto a la hora de ejecutar eel binario con nuestro usuario test, s
 
 Esto sería un ejemplo de como funciona el programa de manera técnica la ejecución del binario
 
-![ALT_TODO:exec_file.png](./img/exec_file.png)
+![Ejecución del binario vulnerable con distintos argumentos en terminal](./img/exec_file.png)
 
 En la primera linea de comandos lo que ha ocurrido es que en la variable buffer la cual tiene de tamaño 64 bytes, está almacenando la letra que le estamos pasando como argumento en este caso la letra **"A"**.
 
@@ -114,7 +114,7 @@ Cuando estamos pasando las **"A"** como argumento, lo que ocurre es que se está
 
 Esto es un ejemplo a nivel visual de como funciona el flujo del programa cuando corrompe.
 
-![ALT_TODO:esquema-pila-desbordamiento.png](./img/esquema-pila-desbordamiento.png)
+![Esquema de la pila sobrescribiendo ESP, EBP y EIP](./img/esquema-pila-desbordamiento.png)
 
 Es importante tener en cuenta esto tres registros ya que debemos de estar pendientes para posteriormente ejecutar la técnica de Ret2libc correctamente.
 
@@ -132,7 +132,7 @@ r $(python3 -c 'print("A"*100)')
 
 Dado los comandos anteriores dará como resultado lo siguiente.
 
-![ALT_TODO:registers.png](./img/registers.png)
+![Registros ESP, EBP y EIP sobrescritos con A en gdb](./img/registers.png)
 
 Como podemos observar los registros de (ESP, EBP y EIP) están sobrescritos por nuestras **"A"**, por lo tanto en lo primero que nos tenemos que fijar es en `EIP` podemos observar que apunta a la dirección de ***0x41414141*** que como nos lo indica a su derecha son nuestras **"A"**
 
@@ -140,7 +140,7 @@ Como podemos observar los registros de (ESP, EBP y EIP) están sobrescritos por 
 
 De las primeras cosas que debemos de averiguar para poder explotar el Ret2libc es conocer el numero de bytes exactos para controlar el registro de EIP. Para ello podemos hacerlo de manera manual pero utilizando [**gdb-peda**](https://github.com/longld/peda).
 
-![ALT_TODO:patterncreate.png](./img/patterncreate.png)
+![Generación de un patrón con pattern create en gdb-peda](./img/patterncreate.png)
 
 Lo que acabamos de realizar es generar un patrón por peda que posteriormente nos permitirá conocer el valor exacto de bytes que debemos de enviar para poder controlar exactamente el EIP.
 
@@ -154,7 +154,7 @@ r 'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeA
 
 una vez ejecutado podremos saber el `offset` **(cantidad de bytes)** exacto para poder manipular el EIP.
 
-![ALT_TODO:offset.png](./img/offset.png)
+![Cálculo del offset exacto para controlar EIP en gdb-peda](./img/offset.png)
 
 Exactamente son 76 bytes que debemos de enviar para controlar el EIP. Para poder saber si es la cantidad exacta podemos comprobarlo de manera manual de manera rápida.
 
@@ -166,7 +166,7 @@ r $(python3 -c 'print("A"*76 + "B"*4)')
 
 La dirección a la que debería de apuntar EIP es ***0x42424242*** correspondiente a nuestras **"B"**.
 
-![ALT_TODO:eipm.png](./img/eipm.png)
+![Registro EIP sobrescrito con 0x42424242 en gdb](./img/eipm.png)
 
 ### Plan de ataque
 
@@ -176,7 +176,7 @@ En este caso al estar el ASLR Activado se nos complica un poco más el ataque qu
 
 En este caso deberemos de seleccionar una de las direcciones `base de libc` las cuales se obtienen de la siguiente manera:
 
-![ALT_TODO:reps.png](./img/reps.png)
+![Direcciones base de libc repetidas en varias ejecuciones de ldd](./img/reps.png)
 
 Como vemos, hemos detectado que existen colisiones de direcciones en la memoria lo cual quiere decir que hay repeticiones. El plan de ataque en sí consiste en conseguir los offsets de `system`, `exit` y `bin_sh` para posteriormente poder sumarle la dirección **base de libc** que nosotros elegimos y calcular las direcciones de `system`, `exit` y `bin_sh` **reales**. A continuación lo veremos en acción para que se comprenda mejor.
 
@@ -187,7 +187,7 @@ Por lo tanto deberemos de hacer "fuerza bruta" ejecutando el programa con el exp
 
 Para obtener los offsets de system, exit y bin_sh deberemos de ejecutar los siguientes comandos:
 
-![ALT_TODO:offsets.png](./img/offsets.png)
+![Offsets de system y exit obtenidos con readelf](./img/offsets.png)
 
 readelf es una herramienta de línea de comandos en sistemas Linux y Unix que se utiliza para analizar archivos ejecutables y objetos en formato ELF (Executable and Linkable Format). Los archivos ELF son un formato común para programas y bibliotecas en sistemas operativos basados en Unix, como Linux.
 
@@ -195,7 +195,7 @@ Con este comando hemos conseguido obtener el offset de `system` y `exit`.
 
 Para obtener el último offset que necesitamos deberemos de ejecutar el siguiente comando:
 
-![ALT_TODO:strings.png](./img/strings.png)
+![Offset de la cadena /bin/sh en libc obtenido con strings](./img/strings.png)
 
 Una vez con todos los offsets obtenidos prosigamos con la creación del exploit.
 
@@ -251,7 +251,7 @@ if __name__ == '__main__':
 
 Este sería el exploit el cual con la libreria subprocess con la funcion call podemos ejecutar desde el mismo exploit el binario en cuestión junto con el payload como argumento para poder realizar el ataque y el resultado sería el siguiente.
 
-![ALT_TODO:final.png](./img/final.png)
+![Exploit por fuerza bruta obteniendo una shell /bin/sh](./img/final.png)
 
 Finalmente hemos logrado poder realizar una llamada a nivel de sistema ejecutandonos una **/bin/sh** pudiendo ejecutar comandos.
 

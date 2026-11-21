@@ -1,11 +1,11 @@
 ---
 title: "Buffer Overflow Windows x32"
-description: "TODO"
+description: "Guía práctica de buffer overflow en Windows x32: fuzzing, cálculo del offset con mona, badchars, JMP ESP y shellcode para obtener reverse shell."
 date: 2025-01-07
 category: explotacion-binarios
 tags: [binary-exploitation]
 cover: ./img/portada.png
-coverAlt: "TODO"
+coverAlt: "Portada del artículo sobre buffer overflow en Windows x32"
 series:
   name: "Buffer Overflow x32"
   order: 4
@@ -26,21 +26,21 @@ Para este tipo de ataque será necesario de alguna manera obtener el PE ejecutab
 
 Antes que nada deberemos de tener un entorno adecuado para explotar esta vulnerabilidad. Necesitaremos tener una máquina Windows preferiblemente elegir la versión del SO igual que al que vamos a atacar, quiero decir si el servicio de la máquina objetivo es un Windows 7 de x32, nosotros deberemos de elegir una máquina Windows 7 de x32 para poder realizar las pruebas y ver si lo podemos explotar antes de manera local y posteriormente realizarlo para la máquina objetivo para que no hayan fallos en la máquina objetivo. Para ello podemos utilizar las siguientes herramientas.
 
-![ALT_TODO:windows.png](./img/windows.png)
+![Máquina virtual Windows de 32 bits preparada para el laboratorio](./img/windows.png)
 
-![ALT_TODO:vmware.png](./img/vmware.png)
+![Configuración de red de la máquina virtual en VMware](./img/vmware.png)
 
 Una vez lo tenemos en red deberemos de tener desactivado el firewall o configurar una regla para poder exponer el puerto que expone localmente el binario y aceptar conexiones desde otros equipos al servicio de nuestro binario. Ajustar tanto una Regla de entrada como una de salida.
 
-![ALT_TODO:firewall.png](./img/firewall.png)
+![Firewall de Windows desactivado para exponer el servicio](./img/firewall.png)
 
 Por último en caso para poder explotar esta vulnerabilidad deberemos de desactivar el DEP.
 
-![ALT_TODO:desactivar.png](./img/desactivar.png)
+![Comando para desactivar DEP en Windows](./img/desactivar.png)
 
 ## Análisis del binario
 
-![ALT_TODO:brainpan.png](./img/brainpan.png)
+![Binario vulnerable brainpan ejecutándose en Windows](./img/brainpan.png)
 
 Cuando ya tenemos conectividad con nuestra máquina local y ejecutamos el binario desde nuestra máquina de atacante (kali) vamos a enumerar el puerto de nuestra máquina local para ver que hay conectividad y se está ejecutando bien el binario.
 
@@ -56,26 +56,26 @@ nc 192.168.1.X 9999
 
 Antes que nada vamos a ver como funciona el programa el cual vamos analizar. Podemos observar que hay un campo en donde nos piden la contraseña, podemos probar a fuzzear ese campo para ver si es vulnerable, para ello lanzaremos una gran cantidad de datos para ver como lo maneja la aplicación.
 
-![ALT_TODO:break.png](./img/break.png)
+![Envío de una cadena larga al campo de contraseña](./img/break.png)
 
-![ALT_TODO:fuzz.png](./img/fuzz.png)
+![Crash del servicio tras el fuzzing del campo vulnerable](./img/fuzz.png)
 
 Como podemos ver en las imagenes anteriores el programa esta copiando el buffer que nosotros le mandamos a otra variable la cual podemos intuir que función vulnerable puede ser `strcpy`.
 
 > [!WARNING]
 > Cuando se realiza este tipo de procedimientos deberemos de reiniciar la aplicacion porque el servicio ha sido interrumpido y ha crasheado.
 
-![ALT_TODO:strings.png](./img/strings.png)
+![Cadenas del binario que revelan el uso de strcpy](./img/strings.png)
 
 Una vez comprobado que es vulnerable a este ataque vamos a proceder a explotar la vulnerabilidad para que nos de una reverse shell o ejecutar cualquier otro conjunto de instrucciones. Para ello deberemos de instalar en la máquina local de Windows 7 la herramienta de **Inmmunity debugger**, hay muchas otras más.
 
 Debemos de descargarnos un archivo de python que deberemos de añadirlo a nuestra aplicación de Inmmunity debugger.
 
-![ALT_TODO:mona.png](./img/mona.png)
+![Script mona.py añadido a Immunity Debugger](./img/mona.png)
 
 Este programa sirve para analizar el flujo del programa después de exceder el buffer. Lo primero que tenemos que hacer es atachearnos al proceso de la aplicación vulnerable.
 
-![ALT_TODO:attach.png](./img/attach.png)
+![Attach al proceso vulnerable desde Immunity Debugger](./img/attach.png)
 
 `File - attach`
 
@@ -85,21 +85,21 @@ Ahora podremos realizar el exceso del buffer para calcular cuantos bytes necesit
 
 El primer paso es identificar la cantidad de bytes exacta para provocar un buffer overflow y conocer con cuantos bytes controlamos el EIP. Para lo haremos de una manera sencilla utilizando la herramienta de metasploit llamada `pattern_create.rb`.
 
-![ALT_TODO:patron.png](./img/patron.png)
+![Generación de un patrón con pattern_create de Metasploit](./img/patron.png)
 
 Lo que hacemos con esta herramientas es generar un patron que lanzaremos sobre el campo vulnerable, donde ponemos la contraseña. Cuando enviemos la data nos fijaremos en el Immunity debugger que dirección tiene EIP para a través de la otra utilidad de metasploit `pattern_offset.rb` saber cuantos bytes corresponden para llegar al EIP.
 
-![ALT_TODO:eip_pattern.png](./img/eip_pattern.png)
+![Immunity Debugger mostrando EIP sobrescrito por el patrón](./img/eip_pattern.png)
 
-![ALT_TODO:offset.png](./img/offset.png)
+![Cálculo del offset de 524 bytes con pattern_offset](./img/offset.png)
 
 La dirección de EIP en este caso es `0x35724134`. Como vemos al sacar el offset nos da un total de 524 caracteres. Para comprobarlo deberemos de generar nuestro patrón sencillo para identificar que exactamente son 524 bytes para llegar a EIP.
 
-![ALT_TODO:test.png](./img/test.png)
+![Generación del patrón de prueba con A y B](./img/test.png)
 
 Una vez generado lo volvemos a lanzar contra el servicio sobre el campo vulnerable y vemos como se comporta.
 
-![ALT_TODO:flujo_test.png](./img/flujo_test.png)
+![Immunity Debugger con EIP valiendo 0x42424242](./img/flujo_test.png)
 
 La dirección de EIP vale `0x42424242` lo cual equivale a las letras "B" en hexadecimal por lo tanto las 524 primeros bytes son el offset y los 4 bytes siguientes son los que se quedaran en el registro de EIP, el resto de bytes que enviamos, las letras "C", podemos ver que están en el ESP. Lo siguiente que deberemos de hacer será encontrar que tipos de badchars no se interpretarían en el ESP dado que en el caso de que hubiera badchars los tendríamos que quitar de nuestro shellcode porque sino no funcionaría la instrucción que le indiquemos.
 
@@ -108,11 +108,11 @@ La dirección de EIP vale `0x42424242` lo cual equivale a las letras "B" en hexa
 
 Lo primero para más comodidad dentro del programa crearemos una carpeta de trabajo.
 
-![ALT_TODO:workingfolder.png](./img/workingfolder.png)
+![Configuración de la carpeta de trabajo de mona](./img/workingfolder.png)
 
 Una vez creada generaremos una serie de bytes para lanzarlo en el campo vulnerable y ver que bytes es capaz el ESP de interpretar y cuales son badchars. Por defecto es buenar práctica eliminar el byte `0x00` ya que suele ser uno de los más comunes entre el `0x0a 0x0d`.
 
-![ALT_TODO:bytearray.png](./img/bytearray.png)
+![Generación del bytearray con mona excluyendo el byte 00](./img/bytearray.png)
 
 Una vez tengamos la serie de bytes que nos lo crea en la carpeta de trabajo llamado como **bytearray** deberemos de pasarlo a nuestra máquina de atacante para crearnos un script en python sencillo para automatizarnos y que sea más rápido la carga de los bytes.
 
@@ -146,47 +146,47 @@ s.close()
 
 Como vemos el offset que es lo que va antes del EIP sería lo que hemos calculado antes los 524 bytes, posteriormente indicamos en el valor de EIP y posteriormente lo que estará en el ESP que será nuestro bytearray generado, posteriormente se conectara al servicio y enviará la data.
 
-![ALT_TODO:badchars.png](./img/badchars.png)
+![Volcado de memoria del ESP con los bytes enviados](./img/badchars.png)
 
 Si nos fijamos en la imagen abajo a la izquierda veremos los bytes **01 02 03...**, esos corresponde a lo que le estamos enviando `\x01\x02\0x03` como para el resto lo mismo. En el caso de que uno no apareciera en ese apartado (flujo de ESP), es que sería un badchar. Para automatizar esto y no hacerlo viendolo a ojo podemos utilizar la herramienta de mona.
 
-![ALT_TODO:compare.png](./img/compare.png)
+![Comparación del bytearray con la memoria del ESP con mona](./img/compare.png)
 
 Lo que esta haciendo es ver que si el contenido que generamos del bytearray coincide con los datos que hay en la direccion de la memoria del ESP.
 
-![ALT_TODO:nobadchars.png](./img/nobadchars.png)
+![Resultado de mona compare sin badchars adicionales](./img/nobadchars.png)
 
 En este caso no hay mas badchars por lo tanto podemos generar ya nuestro shellcode sabiendo que podemos utilizar todos los bytes menos el `0x00`. Pero para completar más esta guía en el caso de que hubiera habido más badchars nos habría salido una ventana como esta.
 
-![ALT_TODO:casobadchars.png](./img/casobadchars.png)
+![Ejemplo de mona compare detectando badchars 0a y 0d](./img/casobadchars.png)
 
 Por lo tanto deberíamos de generar otro bytearray quitando **00 0a y 0d** con los mismo pasos que antes y repetir lo mismo hasta encontrar que no hay más badchars.
 
 Continuando con el desarrollo del exploit necesitamos que EIP apunte a una dirección que actúe como un salto al ESP para que vaya directamente al ESP y ejecute nuestro shellcode. Deberemos de saber que instrucción en ensamblador corresponde a un salto al ESP, utilizaremos la herramienta de metasploit llamada `nasm_shell.rb`.
 
-![ALT_TODO:nasm.png](./img/nasm.png)
+![Opcode de la instrucción JMP ESP obtenido con nasm_shell](./img/nasm.png)
 
 Vemos que las instrucciones son `\xFF\xE4`. Para ello deberemos de ver las protecciones que tiene el binario antes que nada y localizar un modulo que tenga todas las protecciones en **False**.
 
-```LANG_TODO
+```text
 !mona modules
 ```
 
 Eso sería para ver los módulos existentes junto con sus protecciones. al localizar un módulo sin ninguna protección buscamos dentro la instrucción que vimos antes y lo hacemos de la siguiente manera.
 
-![ALT_TODO:modules.png](./img/modules.png)
+![Listado de módulos y protecciones con mona modules](./img/modules.png)
 
-![ALT_TODO:jump.png](./img/jump.png)
+![Búsqueda de la instrucción JMP ESP en el módulo sin protecciones](./img/jump.png)
 
 Para comprobarlo podemos ir a esa dirección de memoria que nos arroja que tiene permisos de `PAGE_EXECUTE_READ (RX)`, esto es importante ya que podemos ejecutar shellcode en el ESP teniendo ese tipo de protección.
 
-![ALT_TODO:breakpoint.png](./img/breakpoint.png)
+![Breakpoint en la dirección JMP ESP dentro del depurador](./img/breakpoint.png)
 
 En la dirección que obtuvimos del módulo vemos que se encuentra esa instrucción. Por lo tanto deberemos de modificar nuestro exploit para en vez de poner las letras **"B"** que poníamos antes para que EIP valiera eso, ahora debemos de indicar esta dirección de la memoria para que nos aplique el salto.
 
 Después de modificar el valor del EIP por la dirección del `JMP ESP` es el paso de generar el shellcode descartanto los badchars que identificamos previamente.
 
-![ALT_TODO:shellcode.png](./img/shellcode.png)
+![Generación del shellcode de reverse shell con msfvenom](./img/shellcode.png)
 
 A través de la utilidad de **msfvenom** generamos un shellcode que nos de una reverse shell, importante indicar la plataforma para windows y la arquitectura x86 y los badchars. Una vez generado el shellcode vamos a adaptarlo a nuestro exploit y a completarlo, el resultado sería el siguiente.
 Al generar el shellcode lo hemos generado con un encoder polimórfico por lo tanto deberemos de darle un tiempo para que se descifre en la memoria por lo tanto podemos utilizar la técnica de añadir varios **NOP** (No operation code) al principio del ESP para que no haga nada durante un tiempo y le de tiempo a descifrarse y cuando llegue a las instrucciones del shellcode las lleve a cabo con éxito.
@@ -238,6 +238,6 @@ s.close()
 
 Por último reiniciamos la aplicación vulnerable y ejecutamos el exploit.
 
-![ALT_TODO:exploit.png](./img/exploit.png)
+![Ejecución del exploit obteniendo reverse shell en Windows](./img/exploit.png)
 
 Como vemos ha sido explotado correctamente y tenemos una reverse shell interactiva. Espero que te haya servido este post !.

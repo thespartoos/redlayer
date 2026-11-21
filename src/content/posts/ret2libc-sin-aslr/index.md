@@ -1,11 +1,11 @@
 ---
 title: "Buffer Overflow Ret2libc sin ASLR"
-description: "TODO"
+description: "Guía de buffer overflow con Ret2libc en Linux x32 sin ASLR: cálculo del offset, control de EIP y llamada a system con /bin/sh paso a paso."
 date: 2023-10-23
 category: explotacion-binarios
 tags: [binary-exploitation]
 cover: ./img/portada.png
-coverAlt: "TODO"
+coverAlt: "Portada del artículo sobre Ret2libc sin ASLR en Linux x32"
 series:
   name: "Buffer Overflow x32"
   order: 2
@@ -41,13 +41,13 @@ echo 0 > /proc/sys/kernel/randomize_va_space
 
 El resultado de dicha comando dará lugar a que no aleatoriza las direcciones de la memoria que es algo fundamental para que el Ret2libc sin ASLR funcione.
 
-![ALT_TODO:ldd.png](./img/ldd.png)
+![Salida de ldd con la dirección de libc fija en cada ejecución](./img/ldd.png)
 
 Si nos fijamos bien en la segunda línea del output contiene la dirección de memoria de libc y comprobamos que es la misma en cada ejecución: `0xb7e08000`.
 
 ## Funcionamiento del programa vulnerable
 
-![ALT_TODO:code_vuln.png](./img/code_vuln.png)
+![Código fuente en C del programa vulnerable con strcpy](./img/code_vuln.png)
 
 Este sería el codigo correspondiente al binario compilado al que se va a explotar un buffer overflow a través de la técnica de Ret2libc.
 
@@ -77,7 +77,7 @@ Una vez hecho esto a la hora de ejecutar eel binario con nuestro usuario test, s
 
 Esto sería un ejemplo de como funciona el programa de manera técnica la ejecución del binario
 
-![ALT_TODO:exec_file.png](./img/exec_file.png)
+![Ejecución del binario vulnerable con distintos argumentos en terminal](./img/exec_file.png)
 
 En la primera linea de comandos lo que ha ocurrido es que en la variable buffer la cual tiene de tamaño 64 bytes, está almacenando la letra que le estamos pasando como argumento en este caso la letra **"A"**.
 
@@ -114,7 +114,7 @@ Cuando estamos pasando las **"A"** como argumento, lo que ocurre es que se está
 
 Esto es un ejemplo a nivel visual de como funciona el flujo del programa cuando corrompe.
 
-![ALT_TODO:esquema-pila-desbordamiento.png](./img/esquema-pila-desbordamiento.png)
+![Esquema de la pila sobrescribiendo ESP, EBP y EIP](./img/esquema-pila-desbordamiento.png)
 
 Es importante tener en cuenta esto tres registros ya que debemos de estar pendientes para posteriormente ejecutar la técnica de Ret2libc correctamente.
 
@@ -132,7 +132,7 @@ r $(python3 -c 'print("A"*100)')
 
 Dado los comandos anteriores dará como resultado lo siguiente.
 
-![ALT_TODO:registers.png](./img/registers.png)
+![Registros ESP, EBP y EIP sobrescritos con A en gdb](./img/registers.png)
 
 Como podemos observar los registros de (ESP, EBP y EIP) están sobrescritos por nuestras **"A"**, por lo tanto en lo primero que nos tenemos que fijar es en `EIP` podemos observar que apunta a la dirección de ***0x41414141*** que como nos lo indica a su derecha son nuestras **"A"**
 
@@ -140,7 +140,7 @@ Como podemos observar los registros de (ESP, EBP y EIP) están sobrescritos por 
 
 De las primeras cosas que debemos de averiguar para poder explotar el Ret2libc es conocer el numero de bytes exactos para controlar el registro de EIP. Para ello podemos hacerlo de manera manual pero utilizando [**gdb-peda**](https://github.com/longld/peda).
 
-![ALT_TODO:patterncreate.png](./img/patterncreate.png)
+![Generación de un patrón con pattern create en gdb-peda](./img/patterncreate.png)
 
 Lo que acabamos de realizar es generar un patrón por peda que posteriormente nos permitirá conocer el valor exacto de bytes que debemos de enviar para poder controlar exactamente el EIP.
 
@@ -154,7 +154,7 @@ r 'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeA
 
 una vez ejecutado podremos saber el `offset` **(cantidad de bytes)** exacto para poder manipular el EIP.
 
-![ALT_TODO:offset.png](./img/offset.png)
+![Cálculo del offset exacto para controlar EIP en gdb-peda](./img/offset.png)
 
 Exactamente son 76 bytes que debemos de enviar para controlar el EIP. Para poder saber si es la cantidad exacta podemos comprobarlo de manera manual de manera rápida.
 
@@ -166,7 +166,7 @@ r $(python3 -c 'print("A"*76 + "B"*4)')
 
 La dirección a la que debería de apuntar EIP es ***0x42424242*** correspondiente a nuestras **"B"**.
 
-![ALT_TODO:eipm.png](./img/eipm.png)
+![Registro EIP sobrescrito con 0x42424242 en gdb](./img/eipm.png)
 
 ### Plan de ataque
 
@@ -176,7 +176,7 @@ El flujo de este ataque consiste en poder controlar el EIP para poder apuntar a 
 
 Antes que nada vamos a ejecutar el binario desde gdb-peda con el comando `r <whatever>` y para poder obtener dichas direcciones deberemos de ejecutar los siguientes comandos dentro de gdb-peda.
 
-![ALT_TODO:data.png](./img/data.png)
+![Direcciones de system, exit y /bin/sh obtenidas en gdb-peda](./img/data.png)
 
 ## Desarrollo del exploit
 
@@ -227,7 +227,7 @@ if __name__ == '__main__':
 
 Este sería el exploit el cual con la libreria subprocess con la funcion call podemos ejecutar desde el mismo exploit el binario en cuestión junto con el payload como argumento para poder realizar el ataque y el resultado sería el siguiente.
 
-![ALT_TODO:final.png](./img/final.png)
+![Ejecución del exploit Ret2libc obteniendo una shell /bin/sh](./img/final.png)
 
 Finalmente hemos logrado poder realizar una llamada a nivel de sistema ejecutandonos una **/bin/sh** pudiendo ejecutar comandos.
 

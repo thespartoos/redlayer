@@ -7,6 +7,7 @@ import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-s
 import tailwindcss from '@tailwindcss/vite';
 import { satteri } from '@astrojs/markdown-satteri';
 import { calloutsPlugin } from './src/lib/callouts.mjs';
+import pagefind from './src/lib/pagefind-integration.mjs';
 
 export default defineConfig({
 	site: 'https://redlayersec.com',
@@ -41,6 +42,7 @@ export default defineConfig({
 		sitemap({
 			filter: (page) => !page.includes('/404'),
 		}),
+		pagefind(),
 	],
 	vite: {
 		plugins: [tailwindcss()],

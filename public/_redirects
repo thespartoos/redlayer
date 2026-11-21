@@ -6,6 +6,9 @@
 # Sitemap antiguo
 /sitemap.xml /sitemap-index.xml 301
 
+# /posts/ no tiene página propia: el listado está en /articulos/
+/posts/ /articulos/ 301
+
 # Páginas del blog antiguo
 /about/ /sobre-mi/ 301
 /archives/ /archivo/ 301

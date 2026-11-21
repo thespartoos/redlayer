@@ -26,9 +26,8 @@ Para este tipo de ataque será necesario de alguna manera obtener el PE ejecutab
 
 Antes que nada deberemos de tener un entorno adecuado para explotar esta vulnerabilidad. Necesitaremos tener una máquina Windows preferiblemente elegir la versión del SO igual que al que vamos a atacar, quiero decir si el servicio de la máquina objetivo es un Windows 7 de x32, nosotros deberemos de elegir una máquina Windows 7 de x32 para poder realizar las pruebas y ver si lo podemos explotar antes de manera local y posteriormente realizarlo para la máquina objetivo para que no hayan fallos en la máquina objetivo. Para ello podemos utilizar las siguientes herramientas.
 
-![Máquina virtual Windows de 32 bits preparada para el laboratorio](./img/windows.png)
-
-![Configuración de red de la máquina virtual en VMware](./img/vmware.png)
+![Logo de Windows](./img/windows.png "logo")
+![Logo de VMware](./img/vmware.png "logo")
 
 Una vez lo tenemos en red deberemos de tener desactivado el firewall o configurar una regla para poder exponer el puerto que expone localmente el binario y aceptar conexiones desde otros equipos al servicio de nuestro binario. Ajustar tanto una Regla de entrada como una de salida.
 
@@ -57,7 +56,6 @@ nc 192.168.1.X 9999
 Antes que nada vamos a ver como funciona el programa el cual vamos analizar. Podemos observar que hay un campo en donde nos piden la contraseña, podemos probar a fuzzear ese campo para ver si es vulnerable, para ello lanzaremos una gran cantidad de datos para ver como lo maneja la aplicación.
 
 ![Envío de una cadena larga al campo de contraseña](./img/break.png)
-
 ![Crash del servicio tras el fuzzing del campo vulnerable](./img/fuzz.png)
 
 Como podemos ver en las imagenes anteriores el programa esta copiando el buffer que nosotros le mandamos a otra variable la cual podemos intuir que función vulnerable puede ser `strcpy`.
@@ -90,7 +88,6 @@ El primer paso es identificar la cantidad de bytes exacta para provocar un buffe
 Lo que hacemos con esta herramientas es generar un patron que lanzaremos sobre el campo vulnerable, donde ponemos la contraseña. Cuando enviemos la data nos fijaremos en el Immunity debugger que dirección tiene EIP para a través de la otra utilidad de metasploit `pattern_offset.rb` saber cuantos bytes corresponden para llegar al EIP.
 
 ![Immunity Debugger mostrando EIP sobrescrito por el patrón](./img/eip_pattern.png)
-
 ![Cálculo del offset de 524 bytes con pattern_offset](./img/offset.png)
 
 La dirección de EIP en este caso es `0x35724134`. Como vemos al sacar el offset nos da un total de 524 caracteres. Para comprobarlo deberemos de generar nuestro patrón sencillo para identificar que exactamente son 524 bytes para llegar a EIP.
@@ -175,7 +172,6 @@ Vemos que las instrucciones son `\xFF\xE4`. Para ello deberemos de ver las prote
 Eso sería para ver los módulos existentes junto con sus protecciones. al localizar un módulo sin ninguna protección buscamos dentro la instrucción que vimos antes y lo hacemos de la siguiente manera.
 
 ![Listado de módulos y protecciones con mona modules](./img/modules.png)
-
 ![Búsqueda de la instrucción JMP ESP en el módulo sin protecciones](./img/jump.png)
 
 Para comprobarlo podemos ir a esa dirección de memoria que nos arroja que tiene permisos de `PAGE_EXECUTE_READ (RX)`, esto es importante ya que podemos ejecutar shellcode en el ESP teniendo ese tipo de protección.

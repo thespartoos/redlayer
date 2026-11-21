@@ -167,7 +167,6 @@
 		font-size: 1.125rem;
 		line-height: 1.7;
 		color: var(--tinta);
-		max-width: var(--container-lectura);
 	}
 	.prosa > * + * {
 		margin-top: 1.25em;
@@ -228,6 +227,32 @@
 		background: var(--casco-2);
 		border: 1px solid var(--junta);
 		overflow-wrap: anywhere;
+	}
+	/* Varias imágenes en líneas seguidas (sin línea en blanco) → lado a lado */
+	.prosa p:has(> img + img) {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		justify-content: center;
+		gap: 1rem;
+	}
+	.prosa p:has(> img + img) > img {
+		flex: 1 1 260px;
+		min-width: 0;
+	}
+	/* ![Alt](./img/x.png "logo") → logo pequeño, sin marco */
+	.prosa img[title='logo'] {
+		flex: 0 0 auto !important;
+		height: 4.5rem;
+		width: auto;
+		border: 0;
+		border-radius: 0;
+		background: none;
+	}
+	.prosa p:has(> img[title='logo']) {
+		align-items: center;
+		gap: 2rem;
+		padding: 0.5rem 0;
 	}
 	.prosa img {
 		border-radius: var(--radius-tarjeta);

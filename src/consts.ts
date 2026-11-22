@@ -28,7 +28,7 @@ export const POSTS_PER_PAGE = 9;
 
 
 /** Token de Cloudflare Web Analytics (Analytics → Web Analytics → Añadir sitio). Vacío = desactivado. */
-export const CF_ANALYTICS_TOKEN = '';
+export const CF_ANALYTICS_TOKEN = 'd370cd0887c8415aa0292fe43b60dfa4';
 
 /** Giscus (https://giscus.app): rellena tras activar Discussions en el repo público. Vacío = sin comentarios. */
 export const GISCUS = {

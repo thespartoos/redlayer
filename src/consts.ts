@@ -26,10 +26,6 @@ export const NAV = [
 
 export const POSTS_PER_PAGE = 9;
 
-/** URL del formulario de Brevo (Formularios → Incrustar → action del <form>). Vacío = desactivado. */
-export const NEWSLETTER = {
-	action: '',
-};
 
 /** Token de Cloudflare Web Analytics (Analytics → Web Analytics → Añadir sitio). Vacío = desactivado. */
 export const CF_ANALYTICS_TOKEN = '';

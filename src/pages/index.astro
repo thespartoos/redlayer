@@ -4,7 +4,6 @@ import Hero from '../components/Hero.astro';
 import PostCard from '../components/PostCard.astro';
 import TerminalWhoami from '../components/TerminalWhoami.astro';
 import MasLeidos from '../components/MasLeidos.astro';
-import Newsletter from '../components/Newsletter.astro';
 import Icon from '../components/Icon.astro';
 import { getPosts } from '../lib/posts';
 import { SITE, AUTHOR } from '../consts';
@@ -105,7 +104,6 @@ const accesos = [
 				</ul>
 			</section>
 			<MasLeidos posts={posts} />
-			<Newsletter />
 		</aside>
 	</div>
 </BaseLayout>

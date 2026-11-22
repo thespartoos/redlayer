@@ -60,9 +60,9 @@ const activo = (href: string) => (href === '/' ? actual === '/' : actual.startsW
 				<Icon name="moon" size={19} class="hidden dark:block" />
 				<Icon name="sun" size={19} class="block dark:hidden" />
 			</button>
-			<a href="/#newsletter" class="boton boton-borde ml-2 hidden !py-2 sm:inline-flex">
-				<Icon name="mail" size={17} />
-				Suscribirme
+			<a href="/feed.xml" class="boton boton-borde ml-2 hidden !py-2 sm:inline-flex" aria-label="Seguir RedLayer por RSS">
+				<Icon name="rss" size={17} />
+				RSS
 			</a>
 			<button
 				type="button"

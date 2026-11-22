@@ -55,7 +55,7 @@ nmap -sCV 10.10.10.5          ← bash/powershell se muestran con marco de termi
 
 | Qué | Dónde |
 |---|---|
-| Nombre, autor, menú, newsletter, analítica, comentarios | `src/consts.ts` |
+| Nombre, autor, menú, analítica, comentarios, contacto | `src/consts.ts` |
 | Categorías y sus colores | `src/data/categorias.ts` |
 | Ranking de "Más leídos" | `src/data/mas-leidos.json` |
 | Campos permitidos en el front matter | `src/content.config.ts` |
@@ -64,5 +64,4 @@ nmap -sCV 10.10.10.5          ← bash/powershell se muestran con marco de termi
 
 ## Pendiente
 
-- Rellenar los `TODO(autor)` de `/sobre-mi/`, aviso legal y privacidad.
-- Activar newsletter (Brevo), comentarios (Giscus), contacto (Web3Forms) y analítica (Cloudflare) en `src/consts.ts`.
+- Activar comentarios (Giscus), contacto (Web3Forms) y analítica (Cloudflare) en `src/consts.ts`.

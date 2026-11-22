@@ -5,7 +5,7 @@ import { SITE } from '../consts';
 
 const title = 'Aviso legal';
 const description =
-	'Aviso legal de RedLayer conforme a la LSSI-CE: datos del titular, condiciones de uso, propiedad intelectual y finalidad educativa del contenido publicado.';
+	'Aviso legal de RedLayer: titular del sitio, condiciones de uso, propiedad intelectual y finalidad educativa del contenido sobre seguridad ofensiva.';
 ---
 
 <BaseLayout title={title} description={description} jsonLd={[migas(['Aviso legal', '/aviso-legal/'])]}>
@@ -19,16 +19,10 @@ const description =
 			</header>
 
 			<h2>Datos identificativos</h2>
-			<p>
-				En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información
-				y de Comercio Electrónico (LSSI-CE), se informa de los datos del titular de este sitio web:
-			</p>
 			<ul>
-				<li><strong>Titular:</strong> TODO(autor): nombre y apellidos.</li>
-				<li><strong>NIF:</strong> TODO(autor): NIF.</li>
-				<li><strong>Domicilio a efectos de notificaciones:</strong> TODO(autor): ciudad o dirección postal.</li>
-				<li><strong>Email de contacto:</strong> TODO(autor): email.</li>
+				<li><strong>Titular:</strong> thespartoos, autor de RedLayer (persona física).</li>
 				<li><strong>Sitio web:</strong> {SITE.url.replace('https://', '')}</li>
+				<li><strong>Contacto:</strong> a través de la página de <a href="/contacto/">contacto</a>.</li>
 			</ul>
 			<p>
 				RedLayer es un blog personal sin ánimo de lucro. No vende productos ni servicios, no contiene publicidad y no

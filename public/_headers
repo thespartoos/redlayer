@@ -1,15 +1,17 @@
-# Cabeceras HTTP de Cloudflare (Pages / Workers Static Assets).
+# Cabeceras HTTP de Cloudflare (Workers Static Assets).
 # Formato: una ruta (admite *) y debajo, sangradas, las cabeceras "Nombre: valor".
-# La CSP está en modo Report-Only: cuando se haya comprobado que no rompe nada,
-# renombra la cabecera a Content-Security-Policy.
+# CSP activa (comprobada sin violaciones en todas las páginas el 22/11/2026).
+# Si añades un servicio externo (script, iframe, fuente…), permite su dominio aquí o se bloqueará.
 
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()
   X-Frame-Options: DENY
-  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
 
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable

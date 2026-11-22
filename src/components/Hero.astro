@@ -13,15 +13,19 @@ const { title, description, cover, coverAlt, category, date } = post.data;
 ---
 
 <article class="panel relative isolate overflow-hidden">
-	<Image
-		src={cover}
-		alt={coverAlt}
-		widths={[800, 1200, 1600]}
-		sizes="(min-width: 1280px) 860px, 100vw"
-		loading="eager"
-		fetchpriority="high"
-		class="absolute inset-0 -z-20 h-full w-full object-cover object-right"
-	/>
+	<!-- En móvil la portada quedaría tapada por el velo: se sirve un píxel vacío y no se descarga (mejor LCP) -->
+	<picture>
+		<source media="(max-width: 767px)" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+		<Image
+			src={cover}
+			alt={coverAlt}
+			widths={[800, 1200, 1600]}
+			sizes="(min-width: 1280px) 860px, 100vw"
+			loading="eager"
+			fetchpriority="high"
+			class="absolute inset-0 -z-20 h-full w-full object-cover object-right"
+		/>
+	</picture>
 	<!-- Velo para que el texto cumpla contraste AA sobre cualquier portada -->
 	<div
 		class="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#0a1020_0%,#0a1020_55%,rgba(10,16,32,.88)_72%,rgba(10,16,32,.35)_100%)] max-md:bg-[#0a1020]/90"

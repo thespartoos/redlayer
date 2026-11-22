@@ -8,7 +8,6 @@ import PostMeta from '../components/PostMeta.astro';
 import Toc from '../components/Toc.astro';
 import AuthorBox from '../components/AuthorBox.astro';
 import PostCard from '../components/PostCard.astro';
-import Giscus from '../components/Giscus.astro';
 import Icon from '../components/Icon.astro';
 import { CATEGORIAS } from '../data/categorias';
 import { SITE, AUTHOR } from '../consts';
@@ -209,7 +208,6 @@ const jsonLd = [
 				}
 
 				<div class="mt-10" data-pagefind-ignore><AuthorBox /></div>
-				<div data-pagefind-ignore><Giscus /></div>
 			</article>
 
 			<aside class="hidden lg:block" data-pagefind-ignore>

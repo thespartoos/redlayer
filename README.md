@@ -55,13 +55,10 @@ nmap -sCV 10.10.10.5          ← bash/powershell se muestran con marco de termi
 
 | Qué | Dónde |
 |---|---|
-| Nombre, autor, menú, analítica, comentarios, contacto | `src/consts.ts` |
+| Nombre, autor, menú y analítica | `src/consts.ts` |
 | Categorías y sus colores | `src/data/categorias.ts` |
 | Ranking de "Más leídos" | `src/data/mas-leidos.json` |
 | Campos permitidos en el front matter | `src/content.config.ts` |
 | Colores, tipografía y estilos de los artículos | `src/styles/global.css` |
 | Cabeceras de seguridad y redirecciones 301 | `public/_headers`, `public/_redirects` |
 
-## Pendiente
-
-- Activar comentarios (Giscus), contacto (Web3Forms) y analítica (Cloudflare) en `src/consts.ts`.
